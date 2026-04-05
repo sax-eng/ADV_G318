@@ -44,33 +44,33 @@ const ROUTE_POINTS = [
 ];
 
 const ROUTE_SCHEMATIC_NODES = [
-  { name:"成都", alt:512, dist:0, type:"city", day:1, side:"bottom", lane:1 },
-  { name:"雅安", alt:641, dist:151, type:"city", day:1, side:"bottom", lane:0 },
+  { name:"成都", alt:512, dist:0, type:"city", day:1, side:"bottom", lane:0 },
+  { name:"雅安", alt:641, dist:151, type:"city", day:1, side:"bottom", lane:1 },
   { name:"二郎山", alt:2170, dist:88, type:"pass", day:1, side:"top", lane:1 },
   { name:"泸定", alt:1330, dist:50, type:"city", day:1, side:"bottom", lane:0 },
-  { name:"康定", alt:2530, dist:51, type:"city", day:2, side:"bottom", lane:1 },
-  { name:"折多山", alt:4298, dist:72, type:"pass", day:2, side:"top", lane:0 },
+  { name:"康定", alt:2530, dist:51, type:"city", day:2, side:"top", lane:0 },
+  { name:"折多山", alt:4298, dist:72, type:"pass", day:2, side:"top", lane:1 },
   { name:"新都桥", alt:3460, dist:83, type:"city", day:2, side:"bottom", lane:0 },
   { name:"雅江", alt:2530, dist:132, type:"city", day:3, side:"bottom", lane:1 },
   { name:"卡子拉山", alt:4718, dist:132, type:"pass", day:3, side:"top", lane:0 },
-  { name:"理塘", alt:4014, dist:132, type:"city", day:3, side:"top", lane:1 },
-  { name:"海子山", alt:4685, dist:174, type:"pass", day:4, side:"top", lane:0 },
+  { name:"理塘", alt:4014, dist:132, type:"city", day:3, side:"bottom", lane:0 },
+  { name:"海子山", alt:4685, dist:174, type:"pass", day:4, side:"top", lane:1 },
   { name:"巴塘", alt:2580, dist:174, type:"city", day:4, side:"bottom", lane:1 },
-  { name:"芒康", alt:3875, dist:107, type:"city", day:5, side:"top", lane:1 },
-  { name:"拉乌山", alt:4338, dist:49, type:"pass", day:5, side:"top", lane:0 },
-  { name:"东达山", alt:5008, dist:44, type:"pass", day:5, side:"top", lane:1 },
+  { name:"芒康", alt:3875, dist:107, type:"city", day:5, side:"top", lane:0 },
+  { name:"拉乌山", alt:4338, dist:49, type:"pass", day:5, side:"top", lane:1 },
+  { name:"东达山", alt:5008, dist:44, type:"pass", day:5, side:"top", lane:0 },
   { name:"左贡", alt:3877, dist:114, type:"city", day:5, side:"bottom", lane:0 },
   { name:"业拉山", alt:4658, dist:109, type:"pass", day:6, side:"top", lane:1 },
   { name:"邦达", alt:4120, dist:97, type:"city", day:6, side:"top", lane:0 },
-  { name:"八宿", alt:3280, dist:97, type:"city", day:6, side:"bottom", lane:0 },
-  { name:"然乌", alt:3960, dist:92, type:"city", day:7, side:"top", lane:1 },
+  { name:"八宿", alt:3280, dist:97, type:"city", day:6, side:"bottom", lane:1 },
+  { name:"然乌", alt:3960, dist:92, type:"city", day:7, side:"bottom", lane:0 },
   { name:"波密", alt:2725, dist:131, type:"city", day:7, side:"bottom", lane:1 },
-  { name:"通麦", alt:2070, dist:47, type:"pass", day:8, side:"top", lane:0 },
+  { name:"通麦", alt:2070, dist:47, type:"pass", day:8, side:"bottom", lane:0 },
   { name:"鲁朗", alt:3285, dist:48, type:"city", day:8, side:"top", lane:1 },
-  { name:"林芝", alt:2930, dist:75, type:"city", day:8, side:"bottom", lane:1 },
-  { name:"工布江达", alt:3440, dist:130, type:"city", day:10, side:"bottom", lane:0 },
-  { name:"墨竹工卡", alt:3823, dist:99, type:"city", day:11, side:"top", lane:1 },
-  { name:"米拉山", alt:5013, dist:116, type:"pass", day:11, side:"top", lane:0 },
+  { name:"林芝", alt:2930, dist:75, type:"city", day:8, side:"bottom", lane:0 },
+  { name:"工布江达", alt:3440, dist:130, type:"city", day:10, side:"bottom", lane:1 },
+  { name:"墨竹工卡", alt:3823, dist:99, type:"city", day:11, side:"top", lane:0 },
+  { name:"米拉山", alt:5013, dist:116, type:"pass", day:11, side:"top", lane:1 },
   { name:"拉萨", alt:3650, dist:69, type:"city", day:11, side:"bottom", lane:0 },
 ];
 
@@ -551,10 +551,10 @@ function RouteMap({ activeDay, importedTracks, onSelectDay }) {
   const width = 1340;
   const height = 660;
   const padding = 70;
-  const topNameYs = [118, 164];
-  const topAltGap = 24;
-  const bottomNameYs = [540, 490];
-  const bottomAltGap = 24;
+  const topNameYs = [138, 176];
+  const topAltGap = 22;
+  const bottomNameYs = [486, 528];
+  const bottomAltGap = 22;
   const points = getSchematicLayout(ROUTE_SCHEMATIC_NODES, width, height, padding);
   const officialPath = buildSmoothPath(points);
 
@@ -602,15 +602,20 @@ function RouteMap({ activeDay, importedTracks, onSelectDay }) {
           const altY = point.side === "top"
             ? nameY - topAltGap
             : nameY + Math.max(point.name.length - 1, 0) * 18 + bottomAltGap;
-          const guideY = point.side === "top" ? nameY + 10 : nameY - 12;
+          const guideStartY = point.side === "top"
+            ? nameY + 8
+            : nameY - 10;
+          const guideEndY = point.side === "top"
+            ? point.y - 14
+            : point.y + 14;
 
           return (
             <g key={point.name} style={{ cursor:"pointer" }} onClick={() => onSelectDay(Math.max(0, point.day - 1))}>
               <line
                 x1={point.x}
-                y1={guideY}
+                y1={guideStartY}
                 x2={point.x}
-                y2={point.side === "top" ? point.y - 12 : point.y + 12}
+                y2={guideEndY}
                 stroke="rgba(111,160,214,0.35)"
                 strokeWidth="1.5"
                 strokeDasharray="3 4"
