@@ -74,13 +74,13 @@ const ROUTE_SCHEMATIC_NODES = [
   { name:"拉萨", alt:3650, dist:69, type:"city", day:11 },
 ];
 
-const SCHEMATIC_DISTANCE_LABEL_INDICES = new Set([1, 3, 5, 7, 9, 11, 14, 16, 19, 22, 24, 26, 27]);
+const SCHEMATIC_DISTANCE_LABEL_INDICES = new Set([1, 5, 7, 9, 14, 16, 19, 24, 26]);
 
 const SCHEMATIC_LABEL_OVERRIDES = {
-  成都: { city: { dx: -10, dy: 114 } },
-  雅安: { city: { dx: 8, dy: 98 } },
-  泸定: { city: { dx: 14, dy: 120 } },
-  康定: { city: { dx: 18, dy: 92 } },
+  成都: { city: { dx: 2, dy: 92 } },
+  雅安: { city: { dx: 8, dy: 90 } },
+  泸定: { city: { dx: 18, dy: 98 } },
+  康定: { city: { dx: 18, dy: 88 } },
   新都桥: { city: { dx: 4, dy: 80 } },
   雅江: { city: { dx: 0, dy: 100 } },
   理塘: { city: { dx: 0, dy: 66 } },
@@ -88,14 +88,14 @@ const SCHEMATIC_LABEL_OVERRIDES = {
   芒康: { city: { dx: 6, dy: 70 } },
   左贡: { city: { dx: 4, dy: 90 } },
   邦达: { city: { dx: 0, dy: 74 } },
-  八宿: { city: { dx: 8, dy: 108 } },
+  八宿: { city: { dx: 8, dy: 94 } },
   然乌: { city: { dx: -10, dy: 84 } },
-  波密: { city: { dx: -10, dy: 112 } },
-  鲁朗: { city: { dx: -6, dy: 74 } },
-  林芝: { city: { dx: 10, dy: 98 } },
-  工布江达: { city: { dx: 0, dy: 108 } },
+  波密: { city: { dx: -12, dy: 96 } },
+  鲁朗: { city: { dx: 4, dy: 88 } },
+  林芝: { city: { dx: 18, dy: 92 } },
+  工布江达: { city: { dx: 8, dy: 94 } },
   墨竹工卡: { city: { dx: 8, dy: 86 } },
-  拉萨: { city: { dx: 12, dy: 82 } },
+  拉萨: { city: { dx: 18, dy: 76 } },
   二郎山: { pass: { dx: 0, dy: -72, altDy: -34 } },
   折多山: { pass: { dx: 0, dy: -96, altDy: -54 } },
   卡子拉山: { pass: { dx: 0, dy: -92, altDy: -50 } },
@@ -103,7 +103,7 @@ const SCHEMATIC_LABEL_OVERRIDES = {
   拉乌山: { pass: { dx: 0, dy: -68, altDy: -32 } },
   东达山: { pass: { dx: 0, dy: -112, altDy: -64 } },
   业拉山: { pass: { dx: 4, dy: -82, altDy: -40 } },
-  通麦: { pass: { dx: -8, dy: -92, altDy: -50 } },
+  通麦: { pass: { dx: 8, dy: -68, altDy: -36 } },
   米拉山: { pass: { dx: 8, dy: -88, altDy: -48 } },
 };
 
@@ -464,6 +464,10 @@ function VerticalLabel({ text, x, y, color, fontSize, gap = 22 }) {
   );
 }
 
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
 function getCityLabelOffset(index) {
   const pattern = [
     { dx: 0, dy: 92 },
@@ -598,8 +602,11 @@ function ElevationChart({ days, activeDay, onSelect }) {
 
 function RouteMap({ activeDay, importedTracks, onSelectDay }) {
   const width = 1280;
-  const height = 560;
+  const height = 620;
   const padding = 52;
+  const cityLabelBottom = height - 118;
+  const cityLabelTop = 180;
+  const passLabelTop = 86;
   const points = getSchematicLayout(ROUTE_SCHEMATIC_NODES, width, height, padding);
   const officialPath = buildSmoothPath(points);
 
@@ -643,7 +650,11 @@ function RouteMap({ activeDay, importedTracks, onSelectDay }) {
           const cityOffset = SCHEMATIC_LABEL_OVERRIDES[point.name]?.city || getCityLabelOffset(index);
           const passOffset = SCHEMATIC_LABEL_OVERRIDES[point.name]?.pass || getPassLabelOffset(index);
           const altY = isPass ? point.y + passOffset.altDy : point.y - 18;
-          const nameY = isCity ? point.y + cityOffset.dy : point.y + passOffset.dy;
+          const unclampedNameY = isCity ? point.y + cityOffset.dy : point.y + passOffset.dy;
+          const labelHeight = isCity ? Math.max(point.name.length - 1, 0) * 18 : 0;
+          const nameY = isCity
+            ? clamp(unclampedNameY, cityLabelTop, cityLabelBottom - labelHeight)
+            : clamp(unclampedNameY, passLabelTop, point.y - 44);
           const rotation = isCity ? 0 : 0;
 
           return (
@@ -652,7 +663,7 @@ function RouteMap({ activeDay, importedTracks, onSelectDay }) {
               {isPass && (
                 <path d={`M ${point.x - 18} ${point.y + 18} L ${point.x - 6} ${point.y - 6} L ${point.x + 2} ${point.y + 10} L ${point.x + 14} ${point.y - 14} L ${point.x + 26} ${point.y + 18}`} fill="none" stroke="#2a95ff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" opacity="0.9" />
               )}
-              <text x={point.x} y={altY} textAnchor="middle" fill="rgba(236,243,250,0.92)" fontSize="12" fontWeight="700">
+              <text x={point.x} y={isPass ? clamp(altY, 58, point.y - 18) : altY} textAnchor="middle" fill="rgba(236,243,250,0.92)" fontSize="12" fontWeight="700">
                 {point.alt}
               </text>
               {isCity ? (
