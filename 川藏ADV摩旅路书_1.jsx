@@ -74,6 +74,8 @@ const ROUTE_SCHEMATIC_NODES = [
   { name:"拉萨", alt:3650, dist:69, type:"city", day:11 },
 ];
 
+const SCHEMATIC_DISTANCE_LABEL_INDICES = new Set([1, 3, 5, 7, 9, 11, 14, 16, 19, 22, 24, 26, 27]);
+
 const EQUIPMENT = {
   "个人骑行装备": {
     icon: "🏍️",
@@ -430,6 +432,25 @@ function VerticalLabel({ text, x, y, color, fontSize, gap = 22 }) {
   );
 }
 
+function getCityLabelOffset(index) {
+  const pattern = [
+    { dx: 0, dy: 92 },
+    { dx: 0, dy: 76 },
+    { dx: 0, dy: 102 },
+    { dx: 0, dy: 82 },
+  ];
+  return pattern[index % pattern.length];
+}
+
+function getPassLabelOffset(index) {
+  const pattern = [
+    { dx: 0, dy: -72, altDy: -36 },
+    { dx: 0, dy: -58, altDy: -24 },
+    { dx: 0, dy: -84, altDy: -42 },
+  ];
+  return pattern[index % pattern.length];
+}
+
 function parseGpxText(text) {
   const parser = new DOMParser();
   const xml = parser.parseFromString(text, "application/xml");
@@ -570,23 +591,27 @@ function RouteMap({ activeDay, importedTracks, onSelectDay }) {
         <path d={officialPath} fill="none" stroke="#4ba7ff" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" />
 
         {points.slice(1).map((point, index) => {
+          if (!SCHEMATIC_DISTANCE_LABEL_INDICES.has(index + 1)) return null;
           const prev = points[index];
           const midX = (prev.x + point.x) / 2;
-          const midY = Math.min(prev.y, point.y) - 22;
+          const bend = index % 2 === 0 ? 26 : 40;
+          const midY = Math.min(prev.y, point.y) - bend;
           return (
-            <text key={`${prev.name}-${point.name}`} x={midX} y={midY} textAnchor="middle" fill="rgba(255,240,214,0.92)" fontSize="16" fontStyle="italic">
+            <text key={`${prev.name}-${point.name}`} x={midX} y={midY} textAnchor="middle" fill="rgba(255,240,214,0.88)" fontSize="14" fontStyle="italic">
               {point.dist}km
             </text>
           );
         })}
 
-        {points.map((point) => {
+        {points.map((point, index) => {
           const isPass = point.type === "pass";
           const isActive = point.day - 1 === activeDay;
           const isCity = point.type === "city";
           const labelColor = isPass ? "#8bc9ff" : "#2e96ff";
-          const altY = isPass ? point.y - 30 : point.y - 22;
-          const nameY = isCity ? point.y + 56 : point.y - 48;
+          const cityOffset = getCityLabelOffset(index);
+          const passOffset = getPassLabelOffset(index);
+          const altY = isPass ? point.y + passOffset.altDy : point.y - 18;
+          const nameY = isCity ? point.y + cityOffset.dy : point.y + passOffset.dy;
           const rotation = isCity ? 0 : 0;
 
           return (
@@ -595,25 +620,25 @@ function RouteMap({ activeDay, importedTracks, onSelectDay }) {
               {isPass && (
                 <path d={`M ${point.x - 18} ${point.y + 18} L ${point.x - 6} ${point.y - 6} L ${point.x + 2} ${point.y + 10} L ${point.x + 14} ${point.y - 14} L ${point.x + 26} ${point.y + 18}`} fill="none" stroke="#2a95ff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" opacity="0.9" />
               )}
-              <text x={point.x} y={altY} textAnchor="middle" fill="rgba(236,243,250,0.92)" fontSize="14" fontWeight="700">
+              <text x={point.x} y={altY} textAnchor="middle" fill="rgba(236,243,250,0.92)" fontSize="13" fontWeight="700">
                 {point.alt}
               </text>
               {isCity ? (
                 <VerticalLabel
                   text={point.name}
-                  x={point.x}
+                  x={point.x + cityOffset.dx}
                   y={nameY}
                   color={labelColor}
-                  fontSize={20}
-                  gap={22}
+                  fontSize={18}
+                  gap={20}
                 />
               ) : (
                 <text
-                  x={point.x}
+                  x={point.x + passOffset.dx}
                   y={nameY}
                   textAnchor="middle"
                   fill={labelColor}
-                  fontSize={16}
+                  fontSize={15}
                   fontWeight="900"
                   transform={rotation ? `rotate(${rotation} ${point.x} ${nameY})` : undefined}
                 >
