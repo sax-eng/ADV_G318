@@ -76,6 +76,37 @@ const ROUTE_SCHEMATIC_NODES = [
 
 const SCHEMATIC_DISTANCE_LABEL_INDICES = new Set([1, 3, 5, 7, 9, 11, 14, 16, 19, 22, 24, 26, 27]);
 
+const SCHEMATIC_LABEL_OVERRIDES = {
+  成都: { city: { dx: -10, dy: 114 } },
+  雅安: { city: { dx: 8, dy: 98 } },
+  泸定: { city: { dx: 14, dy: 120 } },
+  康定: { city: { dx: 18, dy: 92 } },
+  新都桥: { city: { dx: 4, dy: 80 } },
+  雅江: { city: { dx: 0, dy: 100 } },
+  理塘: { city: { dx: 0, dy: 66 } },
+  巴塘: { city: { dx: 0, dy: 94 } },
+  芒康: { city: { dx: 6, dy: 70 } },
+  左贡: { city: { dx: 4, dy: 90 } },
+  邦达: { city: { dx: 0, dy: 74 } },
+  八宿: { city: { dx: 8, dy: 108 } },
+  然乌: { city: { dx: -10, dy: 84 } },
+  波密: { city: { dx: -10, dy: 112 } },
+  鲁朗: { city: { dx: -6, dy: 74 } },
+  林芝: { city: { dx: 10, dy: 98 } },
+  工布江达: { city: { dx: 0, dy: 108 } },
+  墨竹工卡: { city: { dx: 8, dy: 86 } },
+  拉萨: { city: { dx: 12, dy: 82 } },
+  二郎山: { pass: { dx: 0, dy: -72, altDy: -34 } },
+  折多山: { pass: { dx: 0, dy: -96, altDy: -54 } },
+  卡子拉山: { pass: { dx: 0, dy: -92, altDy: -50 } },
+  海子山: { pass: { dx: 0, dy: -98, altDy: -56 } },
+  拉乌山: { pass: { dx: 0, dy: -68, altDy: -32 } },
+  东达山: { pass: { dx: 0, dy: -112, altDy: -64 } },
+  业拉山: { pass: { dx: 4, dy: -82, altDy: -40 } },
+  通麦: { pass: { dx: -8, dy: -92, altDy: -50 } },
+  米拉山: { pass: { dx: 8, dy: -88, altDy: -48 } },
+};
+
 const EQUIPMENT = {
   "个人骑行装备": {
     icon: "🏍️",
@@ -595,10 +626,10 @@ function RouteMap({ activeDay, importedTracks, onSelectDay }) {
           if (!SCHEMATIC_DISTANCE_LABEL_INDICES.has(index + 1)) return null;
           const prev = points[index];
           const midX = (prev.x + point.x) / 2;
-          const bend = index % 2 === 0 ? 26 : 40;
+          const bend = index % 2 === 0 ? 34 : 48;
           const midY = Math.min(prev.y, point.y) - bend;
           return (
-            <text key={`${prev.name}-${point.name}`} x={midX} y={midY} textAnchor="middle" fill="rgba(255,240,214,0.88)" fontSize="14" fontStyle="italic">
+            <text key={`${prev.name}-${point.name}`} x={midX} y={midY} textAnchor="middle" fill="rgba(255,240,214,0.88)" fontSize="13" fontStyle="italic">
               {point.dist}km
             </text>
           );
@@ -609,8 +640,8 @@ function RouteMap({ activeDay, importedTracks, onSelectDay }) {
           const isActive = point.day - 1 === activeDay;
           const isCity = point.type === "city";
           const labelColor = isPass ? "#8bc9ff" : "#2e96ff";
-          const cityOffset = getCityLabelOffset(index);
-          const passOffset = getPassLabelOffset(index);
+          const cityOffset = SCHEMATIC_LABEL_OVERRIDES[point.name]?.city || getCityLabelOffset(index);
+          const passOffset = SCHEMATIC_LABEL_OVERRIDES[point.name]?.pass || getPassLabelOffset(index);
           const altY = isPass ? point.y + passOffset.altDy : point.y - 18;
           const nameY = isCity ? point.y + cityOffset.dy : point.y + passOffset.dy;
           const rotation = isCity ? 0 : 0;
@@ -621,7 +652,7 @@ function RouteMap({ activeDay, importedTracks, onSelectDay }) {
               {isPass && (
                 <path d={`M ${point.x - 18} ${point.y + 18} L ${point.x - 6} ${point.y - 6} L ${point.x + 2} ${point.y + 10} L ${point.x + 14} ${point.y - 14} L ${point.x + 26} ${point.y + 18}`} fill="none" stroke="#2a95ff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" opacity="0.9" />
               )}
-              <text x={point.x} y={altY} textAnchor="middle" fill="rgba(236,243,250,0.92)" fontSize="13" fontWeight="700">
+              <text x={point.x} y={altY} textAnchor="middle" fill="rgba(236,243,250,0.92)" fontSize="12" fontWeight="700">
                 {point.alt}
               </text>
               {isCity ? (
@@ -630,8 +661,8 @@ function RouteMap({ activeDay, importedTracks, onSelectDay }) {
                   x={point.x + cityOffset.dx}
                   y={nameY}
                   color={labelColor}
-                  fontSize={18}
-                  gap={20}
+                  fontSize={17}
+                  gap={18}
                 />
               ) : (
                 <text
@@ -639,7 +670,7 @@ function RouteMap({ activeDay, importedTracks, onSelectDay }) {
                   y={nameY}
                   textAnchor="middle"
                   fill={labelColor}
-                  fontSize={15}
+                  fontSize={14}
                   fontWeight="900"
                   transform={rotation ? `rotate(${rotation} ${point.x} ${nameY})` : undefined}
                 >
@@ -879,11 +910,11 @@ function App() {
   const nextDay = DAYS[Math.min(activeDay + 1, DAYS.length - 1)];
   const tabs = [
     { id:"route", icon:"🗺️", label:"路书" },
-    { id:"photos", icon:"🖼️", label:"实景" },
     { id:"tips", icon:"📒", label:"经验" },
     { id:"equip", icon:"🎒", label:"装备" },
     { id:"emergency", icon:"🆘", label:"应急" },
     { id:"checklist", icon:"✅", label:"出发" },
+    { id:"photos", icon:"🖼️", label:"实景打卡" },
   ];
 
   const handleInstall = async () => {
@@ -980,9 +1011,9 @@ function App() {
         .glass { background: var(--surface); border: 1px solid var(--border); box-shadow: 0 24px 80px rgba(0,0,0,.24); }
         .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 18px; }
         .stats-card { border-radius: 16px; padding: 14px 12px; background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); border: 1px solid var(--border); }
-        .tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; }
+        .tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; flex-wrap: wrap; }
         .tabs-mobile { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 40; background: rgba(6,12,20,.92); border: 1px solid rgba(255,255,255,.08); border-radius: 18px; padding: 8px; backdrop-filter: blur(14px); box-shadow: 0 20px 40px rgba(0,0,0,.35); }
-        .tab-btn { border: none; background: transparent; color: var(--muted); padding: 11px 16px; border-radius: 14px; display: flex; gap: 8px; align-items: center; font: inherit; font-weight: 700; cursor: pointer; white-space: nowrap; }
+        .tab-btn { border: none; background: transparent; color: var(--muted); padding: 11px 14px; border-radius: 14px; display: flex; gap: 8px; align-items: center; font: inherit; font-weight: 700; cursor: pointer; white-space: nowrap; }
         .tab-btn-active { color: var(--text); background: linear-gradient(135deg, rgba(59,158,255,.18), rgba(18,219,155,.16)); }
         .chip { padding: 6px 10px; border-radius: 999px; background: rgba(59,158,255,.12); color: #8ac5ff; font-size: 12px; font-weight: 700; border: 1px solid rgba(59,158,255,.18); }
         .chip-track { background: rgba(245,166,35,.12); color: #ffd088; border-color: rgba(245,166,35,.18); }
@@ -1010,6 +1041,7 @@ function App() {
         @media (max-width: 820px) {
           .app-shell { padding: 14px 12px 104px; }
           .stats-grid { grid-template-columns: repeat(2, 1fr); }
+          .tabs { flex-wrap: nowrap; }
         }
         @media (max-width: 640px) {
           .section-card { padding: 14px; border-radius: 16px; }
