@@ -497,7 +497,11 @@ function PwaMeta({ onInstallReady }) {
     appleIcon.setAttribute("href", "./pwa-icon.svg");
     head.appendChild(appleIcon);
 
-    if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js").catch(() => {});
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("./sw.js").then((registration) => {
+        if (registration.waiting) registration.waiting.postMessage({ type: "SKIP_WAITING" });
+      }).catch(() => {});
+    }
 
     const onBeforeInstallPrompt = (event) => {
       event.preventDefault();
