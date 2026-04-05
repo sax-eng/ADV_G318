@@ -173,6 +173,75 @@ const CHECKLIST_PERSON = [
   "体检（心肺功能）","保险（意外险 + 高原附加 + 商业险）","紧急联系人互换","离线地图下载","急救知识培训（CPR）","气象预报跟踪"
 ];
 
+const EXPERIENCE_SECTIONS = [
+  {
+    id: "timing",
+    icon: "🗓️",
+    title: "出发窗口",
+    summary: "优先选 5 月中下旬到 6 月上旬，或 9 月中旬到 9 月底。",
+    bullets: [
+      "雨季主段通常更容易遇到塌方、泥石流和长时间交通管制。",
+      "过晚进藏更容易遇到垭口降雪、暗冰和早晚极低温。",
+      "如果总假期偏短，宁可减少支线和停留点，也别压缩高海拔适应时间。"
+    ]
+  },
+  {
+    id: "rhythm",
+    icon: "🧭",
+    title: "骑行节奏",
+    summary: "别把摩旅做成赶路，高海拔路段节奏比里程更重要。",
+    bullets: [
+      "进入 3000 米以上区域后，爬升快的时候要主动停车休息、补水和观察状态。",
+      "遇到大车、落石、浓雾、雨雪时，优先保节奏和安全，不争一口气。",
+      "如果当天状态差，提前住下比硬扛到原计划终点更合理。"
+    ]
+  },
+  {
+    id: "signal",
+    icon: "📶",
+    title: "通讯与导航",
+    summary: "不要把导航和联络都压在一台手机、一张卡上。",
+    bullets: [
+      "建议至少两台设备或两种运营商组合，主导航和备用导航分开。",
+      "离线地图和 GPX 提前下好，遇到无网区也能继续看路。",
+      "重要联系人、住宿点和救援电话保存在本地，不依赖聊天记录回查。"
+    ]
+  },
+  {
+    id: "lodging",
+    icon: "🏨",
+    title: "住宿判断",
+    summary: "川西和藏区住宿条件波动很大，别按城市标准预期。",
+    bullets: [
+      "县城通常更容易找到条件稳定的住宿，临时停在村镇时要先问清热水、洗浴和停车。",
+      "旺季傍晚再找房更被动，遇到合适地点可以提前收车。",
+      "如果前方有交通管制或天气恶化，不要执着于一定赶到下一个大县城。"
+    ]
+  },
+  {
+    id: "packing",
+    icon: "🎒",
+    title: "装备取舍",
+    summary: "成熟线路先做减法，少带没用过、不会用、路上不好收纳的东西。",
+    bullets: [
+      "这条线路补给密度不算低，真正高频使用的是保暖、防雨、补胎、充电和药品。",
+      "没有明确露营计划时，重型露营装备通常只会拖慢节奏。",
+      "每件装备都要问自己两遍：会不会用、坏了能不能在路上替代。"
+    ]
+  },
+  {
+    id: "safety",
+    icon: "⚠️",
+    title: "安全底线",
+    summary: "不夜骑、不硬撑、不和大车抢线，是最有价值的三条底线。",
+    bullets: [
+      "过弯前完成减速和降挡，弯中不做激烈操作。",
+      "落石区、临崖区、视线差路段不要久停拍照。",
+      "人不舒服、车不对劲、天气变坏，任何一个触发都值得降级当天计划。"
+    ]
+  }
+];
+
 const STORAGE_KEYS = {
   checkedEquip: "g318-checked-equip",
   checkedVehicle: "g318-checked-vehicle",
@@ -585,6 +654,7 @@ function App() {
   const nextDay = DAYS[Math.min(activeDay + 1, DAYS.length - 1)];
   const tabs = [
     { id:"route", icon:"🗺️", label:"路书" },
+    { id:"tips", icon:"📒", label:"经验" },
     { id:"equip", icon:"🎒", label:"装备" },
     { id:"emergency", icon:"🆘", label:"应急" },
     { id:"checklist", icon:"✅", label:"出发" },
@@ -785,6 +855,24 @@ function App() {
           </div>
         )}
 
+        {!rideMode && (
+          <div className="section-card" style={{ marginBottom:18 }}>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(180px,1fr))", gap:10 }}>
+              {[
+                { title:"最佳窗口", text:"建议 5–6 月初或 9 月中下旬，尽量避开雨季主段和大雪窗口。" },
+                { title:"信号策略", text:"主导航、备用导航和联系人不要压在同一台设备上。" },
+                { title:"住宿策略", text:"遇到天气和交通不稳时，先住下比强行赶路更值。" },
+                { title:"装备原则", text:"优先带高频使用的保暖、防雨、补胎和供电装备。" },
+              ].map((item) => (
+                <div key={item.title} style={{ padding:14, borderRadius:14, background:"var(--card)" }}>
+                  <div style={{ fontSize:15, fontWeight:900, marginBottom:6 }}>{item.title}</div>
+                  <div style={{ fontSize:13, color:"var(--muted)", lineHeight:1.7 }}>{item.text}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <Tabs tabs={tabs} active={tab} onChange={setTab} rideMode={rideMode} mobile={mobile} />
 
         <div style={{ marginTop:18 }}>
@@ -886,6 +974,52 @@ function App() {
                   </div>
                 </div>
               </div>
+            </div>
+          )}
+
+          {tab === "tips" && (
+            <div>
+              <div className="route-grid" style={{ marginBottom:16 }}>
+                <div className="section-card">
+                  <div style={{ fontSize:13, color:"var(--muted)", marginBottom:8 }}>路线经验</div>
+                  <div style={{ fontSize:24, fontWeight:900, marginBottom:8 }}>把路书做成能上路的决策工具</div>
+                  <div style={{ fontSize:14, color:"var(--muted)", lineHeight:1.8 }}>
+                    这一版把常见川藏攻略里真正高频、真正能降低失误率的信息抽出来了。重点不是堆素材，而是帮骑行中快速判断：
+                    今天该不该继续赶，设备怎么备份，住哪里更稳，哪些装备其实可以不带。
+                  </div>
+                </div>
+
+                <div className="section-card">
+                  <div style={{ fontSize:13, color:"var(--muted)", marginBottom:8 }}>三条总原则</div>
+                  {[
+                    "高海拔先看状态，再看里程。",
+                    "天气、路况、车况任一变差，就主动降级计划。",
+                    "成熟线路不等于没有风险，真正的风险通常来自赶路和侥幸。"
+                  ].map((item) => (
+                    <div key={item} style={{ padding:"12px 14px", borderRadius:14, background:"var(--card)", marginBottom:10, fontSize:14, lineHeight:1.7 }}>
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {EXPERIENCE_SECTIONS.map((section) => (
+                <div key={section.id} className="section-card" style={{ marginBottom:12 }}>
+                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", gap:12, flexWrap:"wrap", marginBottom:12 }}>
+                    <div>
+                      <div style={{ fontSize:18, fontWeight:900 }}>{section.icon} {section.title}</div>
+                      <div style={{ fontSize:13, color:"var(--muted)", marginTop:6 }}>{section.summary}</div>
+                    </div>
+                  </div>
+                  <div style={{ display:"grid", gap:10 }}>
+                    {section.bullets.map((bullet) => (
+                      <div key={bullet} style={{ padding:"12px 14px", borderRadius:14, background:"var(--card)", fontSize:14, lineHeight:1.7 }}>
+                        {bullet}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 
