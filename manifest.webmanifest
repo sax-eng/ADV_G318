@@ -1,7 +1,7 @@
 {
   "name": "川藏 ADV 摩旅路书",
   "short_name": "G318 ADV",
-  "description": "支持川藏路线地图、GPX 导入、骑行模式和离线访问的 ADV 摩旅路书",
+  "description": "队友手机可直接打开的川藏 G318 ADV 摩旅导航，支持路线图、GPX、骑行模式和离线访问",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

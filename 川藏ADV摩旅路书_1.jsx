@@ -682,10 +682,10 @@ function App() {
             <div style={{ fontSize:12, letterSpacing:4, color:"var(--muted)", textTransform:"uppercase", marginBottom:8 }}>G318 Adventure Ride Book</div>
             <h1 style={{ margin:"0 0 8px", fontSize:mobile ? 28 : 38, lineHeight:1.05, fontWeight:900, letterSpacing:"-0.02em" }}>
               <span style={{ background:"linear-gradient(135deg, #ECF3FA 0%, #89D2FF 40%, #44F0BF 100%)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
-                川藏 ADV 摩旅路书
+                川藏 ADV 摩旅导航
               </span>
             </h1>
-            <div style={{ fontSize:14, color:"var(--muted)" }}>地图、GPX、骑行模式、离线 PWA 已整合到同一界面</div>
+            <div style={{ fontSize:14, color:"var(--muted)" }}>队友手机直接打开即可查看路线、日程、装备和应急信息</div>
           </div>
 
           <div style={{ display:"flex", alignItems:"center", gap:10, flexWrap:"wrap" }}>
@@ -713,6 +713,24 @@ function App() {
             </div>
           ))}
         </div>
+
+        {!rideMode && (
+          <div className="section-card" style={{ marginBottom:18 }}>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(180px,1fr))", gap:10 }}>
+              {[
+                { title:"📱 手机打开", text:"直接用浏览器打开链接，适合导航前快速查看。" },
+                { title:"🧭 骑行查看", text:"切到骑行模式后，重点展示当天路段、海拔和风险提示。" },
+                { title:"📦 离线可用", text:"首次联网打开后可安装到主屏幕，后续离线重开。" },
+                { title:"👥 发给队友", text:"统一链接分发，所有人看到的是同一份路书和应急信息。" },
+              ].map((item) => (
+                <div key={item.title} style={{ padding:14, borderRadius:14, background:"var(--card)" }}>
+                  <div style={{ fontSize:15, fontWeight:900, marginBottom:6 }}>{item.title}</div>
+                  <div style={{ fontSize:13, color:"var(--muted)", lineHeight:1.7 }}>{item.text}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {rideMode && (
           <div className="hud">
