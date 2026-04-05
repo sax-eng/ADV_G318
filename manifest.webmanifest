@@ -1,0 +1,19 @@
+{
+  "name": "川藏 ADV 摩旅路书",
+  "short_name": "G318 ADV",
+  "description": "支持川藏路线地图、GPX 导入、骑行模式和离线访问的 ADV 摩旅路书",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#07111c",
+  "theme_color": "#0b1420",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "./pwa-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
