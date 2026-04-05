@@ -3,15 +3,15 @@ const { useState, useEffect, useRef } = React;
 const DAYS = [
   { day:"D1", from:"成都", to:"泸定", km:280, road:"成雅高速 + G318，雅安后进入盘山段", altStart:500, altEnd:1330, altMax:1330, altMaxName:"泸定", nodes:"成都 → 雅安 → 天全 → 二郎山隧道 → 泸定", fuel:"雅安、天全", stay:"泸定县城宾馆", warn:"二郎山隧道内湿滑，出隧道后温差大，注意起雾", difficulty:1 },
   { day:"D2", from:"泸定", to:"新都桥", km:170, road:"G318 弯道密集，折多山为首个高海拔垭口", altStart:1330, altEnd:3460, altMax:4298, altMaxName:"折多山垭口", nodes:"泸定 → 康定 → 折多山 → 新都桥", fuel:"康定城区加满", stay:"新都桥镇客栈", warn:"折多山高反初期高发，下山弯多，注意制动温度", difficulty:3 },
-  { day:"D3", from:"新都桥", to:"理塘", km:210, road:"高尔寺山、剪子弯山、卡子拉山连续高海拔", altStart:3460, altEnd:4014, altMax:4718, altMaxName:"卡子拉山", nodes:"新都桥 → 雅江 → 剪子弯山 → 卡子拉山 → 理塘", fuel:"雅江、理塘", stay:"理塘县城酒店", warn:"连续三个 4,000m+ 垭口，夜间温度可能降至 0°C 以下", difficulty:4 },
-  { day:"D4", from:"理塘", to:"巴塘", km:170, road:"海子山垭口后长下坡，整体路况较好", altStart:4014, altEnd:2580, altMax:4685, altMaxName:"海子山", nodes:"理塘 → 海子山 → 姊妹湖 → 巴塘", fuel:"巴塘", stay:"巴塘县城", warn:"长下坡注意刹车温度和轮胎状态", difficulty:2 },
-  { day:"D5", from:"巴塘", to:"左贡", km:260, road:"过金沙江入藏，跨越东达山等多座高山", altStart:2580, altEnd:3877, altMax:5130, altMaxName:"东达山", nodes:"巴塘 → 金沙江大桥 → 芒康 → 觉巴山 → 东达山 → 左贡", fuel:"芒康、左贡", stay:"左贡县城", warn:"东达山海拔高，春秋易有积雪或暗冰", difficulty:5 },
-  { day:"D6", from:"左贡", to:"八宿", km:200, road:"邦达草原至怒江 72 拐，全程最险路段之一", altStart:3877, altEnd:3260, altMax:4618, altMaxName:"业拉山", nodes:"左贡 → 邦达 → 业拉山 → 怒江72拐 → 八宿", fuel:"邦达、八宿", stay:"八宿县城", warn:"72 拐急弯密集，可能伴随碎石和对向大车", difficulty:5 },
-  { day:"D7", from:"八宿", to:"波密", km:220, road:"安久拉山后进入林区，景色和路况都明显改善", altStart:3260, altEnd:2750, altMax:4468, altMaxName:"安久拉山", nodes:"八宿 → 安久拉山 → 然乌湖 → 米堆冰川 → 波密", fuel:"然乌、波密", stay:"波密县城", warn:"雨季常见塌方与泥石流，需提前确认路况", difficulty:3 },
-  { day:"D8", from:"波密", to:"林芝", km:230, road:"通麦桥隧已改善，色季拉山段常见浓雾", altStart:2750, altEnd:2930, altMax:4728, altMaxName:"色季拉山", nodes:"波密 → 通麦 → 鲁朗 → 色季拉山 → 林芝", fuel:"鲁朗、林芝", stay:"林芝八一镇", warn:"色季拉山云雾重，能见度差时禁止激进超车", difficulty:3 },
-  { day:"D9", from:"林芝", to:"林芝", km:0, road:"休整日，车辆与人员恢复", altStart:2930, altEnd:2930, altMax:2930, altMaxName:"林芝", nodes:"车辆检查 → 物资补充 → 高反恢复", fuel:"林芝", stay:"林芝", warn:"休整日优先做轮胎、刹车、链条和机油检查", difficulty:0 },
-  { day:"D10", from:"林芝", to:"工布江达", km:270, road:"林拉公路路况优异，部分区段高速化", altStart:2930, altEnd:3440, altMax:3440, altMaxName:"工布江达", nodes:"林芝 → 尼洋河风光带 → 工布江达", fuel:"沿途充足", stay:"工布江达县城", warn:"路况好时更容易超速，注意横风和测速", difficulty:1 },
-  { day:"D11", from:"工布江达", to:"拉萨", km:270, road:"翻越米拉山后整体顺畅，拉萨前车流增多", altStart:3440, altEnd:3650, altMax:5013, altMaxName:"米拉山", nodes:"工布江达 → 米拉山 → 墨竹工卡 → 达孜 → 拉萨", fuel:"沿途充足", stay:"拉萨市区", warn:"进拉萨前注意疲劳驾驶和城市交通节奏变化", difficulty:2 },
+  { day:"D3", from:"新都桥", to:"理塘", km:215, road:"经高原平台进入雅江与理塘方向，连续高海拔起伏", altStart:3460, altEnd:4014, altMax:4718, altMaxName:"卡子拉山", nodes:"新都桥 → 雅江 → 剪子弯山 → 卡子拉山 → 理塘", fuel:"雅江、理塘", stay:"理塘县城酒店", warn:"高海拔长距离巡航容易忽视疲劳和缺氧，注意补水与停车频率", difficulty:4 },
+  { day:"D4", from:"理塘", to:"巴塘", km:174, road:"海子山后长下坡，整体路况较顺但制动负担增加", altStart:4014, altEnd:2580, altMax:4685, altMaxName:"海子山", nodes:"理塘 → 海子山 → 姊妹湖 → 巴塘", fuel:"巴塘", stay:"巴塘县城", warn:"海子山后持续下落差，大车和连续刹车是风险点", difficulty:2 },
+  { day:"D5", from:"巴塘", to:"左贡", km:265, road:"过金沙江入藏，经芒康、拉乌山、东达山进入左贡", altStart:2580, altEnd:3877, altMax:5008, altMaxName:"东达山", nodes:"巴塘 → 竹巴笼 → 芒康 → 拉乌山 → 东达山 → 左贡", fuel:"芒康、左贡", stay:"左贡县城", warn:"东达山海拔高且风大，芒康之后要预留车况和天气缓冲", difficulty:5 },
+  { day:"D6", from:"左贡", to:"八宿", km:206, road:"翻业拉山，过怒江72拐与邦达草原，节奏紧张", altStart:3877, altEnd:3280, altMax:4658, altMaxName:"业拉山", nodes:"左贡 → 业拉山 → 怒江72拐 → 邦达 → 八宿", fuel:"邦达、八宿", stay:"八宿县城", warn:"72拐急弯和下切河谷并存，是全线最需要控速的一段", difficulty:5 },
+  { day:"D7", from:"八宿", to:"波密", km:223, road:"经然乌进入林区，地貌由高寒转向湿润峡谷", altStart:3280, altEnd:2725, altMax:3960, altMaxName:"然乌", nodes:"八宿 → 然乌 → 安久拉山口附近 → 波密", fuel:"然乌、波密", stay:"波密县城", warn:"雨季这一段易塌方、泥石流，连续弯道中别贪快", difficulty:3 },
+  { day:"D8", from:"波密", to:"八一", km:170, road:"经通麦和鲁朗进入林芝八一，路况改善但车流明显增加", altStart:2725, altEnd:2930, altMax:3285, altMaxName:"鲁朗", nodes:"波密 → 通麦 → 鲁朗 → 八一", fuel:"鲁朗、八一", stay:"林芝八一镇", warn:"通麦与鲁朗段天气变化快，午后更容易起雾和降雨", difficulty:2 },
+  { day:"D9", from:"八一", to:"八一", km:0, road:"休整日，车辆与人员恢复", altStart:2930, altEnd:2930, altMax:2930, altMaxName:"八一", nodes:"车辆检查 → 物资补充 → 高反恢复 → 林芝城区机动", fuel:"八一", stay:"八一", warn:"休整日优先做轮胎、刹车、链条和机油检查", difficulty:0 },
+  { day:"D10", from:"八一", to:"工布江达", km:130, road:"尼洋河谷路况稳定，适合做一个短里程恢复日", altStart:2930, altEnd:3440, altMax:3440, altMaxName:"工布江达", nodes:"八一 → 尼洋河风光带 → 工布江达", fuel:"沿途充足", stay:"工布江达县城", warn:"看似轻松，但高原连续骑行后的疲劳会在短日程里集中显现", difficulty:1 },
+  { day:"D11", from:"工布江达", to:"拉萨", km:284, road:"经墨竹工卡、松多、米拉山后进入拉萨平缓收束段", altStart:3440, altEnd:3650, altMax:5013, altMaxName:"米拉山", nodes:"工布江达 → 墨竹工卡 → 松多 → 米拉山 → 拉萨", fuel:"沿途充足", stay:"拉萨市区", warn:"最后一天里程不短，翻过米拉山后仍要防止情绪放松导致注意力下降", difficulty:3 },
 ];
 
 const ROUTE_POINTS = [
@@ -401,13 +401,14 @@ function getSchematicLayout(nodes, width, height, padding) {
   const totalDistance = nodes.reduce((sum, node) => sum + node.dist, 0);
   const maxAlt = Math.max(...nodes.map((node) => node.alt));
   const minAlt = Math.min(...nodes.map((node) => node.alt));
-  const chartHeight = height - padding * 2;
+  const lineTop = 210;
+  const lineBottom = 470;
   let cumulative = 0;
 
   return nodes.map((node) => {
     cumulative += node.dist;
     const x = padding + (cumulative / totalDistance) * (width - padding * 2);
-    const y = height - padding - ((node.alt - minAlt) / (maxAlt - minAlt || 1)) * chartHeight * 0.72 - chartHeight * 0.06;
+    const y = lineBottom - ((node.alt - minAlt) / (maxAlt - minAlt || 1)) * (lineBottom - lineTop);
     return { ...node, x, y };
   });
 }
@@ -547,13 +548,13 @@ function ElevationChart({ days, activeDay, onSelect }) {
 }
 
 function RouteMap({ activeDay, importedTracks, onSelectDay }) {
-  const width = 1280;
-  const height = 620;
+  const width = 1340;
+  const height = 660;
   const padding = 70;
   const topNameYs = [118, 164];
-  const topAltGap = 28;
-  const bottomNameYs = [450, 496];
-  const bottomAltGap = 30;
+  const topAltGap = 24;
+  const bottomNameYs = [540, 490];
+  const bottomAltGap = 24;
   const points = getSchematicLayout(ROUTE_SCHEMATIC_NODES, width, height, padding);
   const officialPath = buildSmoothPath(points);
 
@@ -582,7 +583,7 @@ function RouteMap({ activeDay, importedTracks, onSelectDay }) {
           if (!SCHEMATIC_DISTANCE_LABEL_INDICES.has(index + 1)) return null;
           const prev = points[index];
           const midX = (prev.x + point.x) / 2;
-          const midY = ((prev.y + point.y) / 2) - (index % 2 === 0 ? 8 : -8);
+          const midY = ((prev.y + point.y) / 2) + (index % 2 === 0 ? -8 : 10);
           return (
             <text key={`${prev.name}-${point.name}`} x={midX} y={midY} textAnchor="middle" fill="rgba(255,240,214,0.9)" fontSize="13" fontStyle="italic">
               {point.dist}km
@@ -601,9 +602,19 @@ function RouteMap({ activeDay, importedTracks, onSelectDay }) {
           const altY = point.side === "top"
             ? nameY - topAltGap
             : nameY + Math.max(point.name.length - 1, 0) * 18 + bottomAltGap;
+          const guideY = point.side === "top" ? nameY + 10 : nameY - 12;
 
           return (
             <g key={point.name} style={{ cursor:"pointer" }} onClick={() => onSelectDay(Math.max(0, point.day - 1))}>
+              <line
+                x1={point.x}
+                y1={guideY}
+                x2={point.x}
+                y2={point.side === "top" ? point.y - 12 : point.y + 12}
+                stroke="rgba(111,160,214,0.35)"
+                strokeWidth="1.5"
+                strokeDasharray="3 4"
+              />
               <circle cx={point.x} cy={point.y} r={isActive ? 8 : 6} fill={isActive ? "var(--warn)" : "#f2dfd3"} stroke="#c77f59" strokeWidth="2.5" />
               {isPass && (
                 <path d={`M ${point.x - 18} ${point.y + 18} L ${point.x - 6} ${point.y - 6} L ${point.x + 2} ${point.y + 10} L ${point.x + 14} ${point.y - 14} L ${point.x + 26} ${point.y + 18}`} fill="none" stroke="#2a95ff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" opacity="0.9" />
