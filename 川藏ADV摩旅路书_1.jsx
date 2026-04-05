@@ -357,6 +357,7 @@ const STORAGE_KEYS = {
   tab: "g318-tab",
   rideMode: "g318-ride-mode",
   gpxTracks: "g318-gpx-tracks",
+  dayPhotos: "g318-day-photos",
 };
 
 function diffColor(d) {
@@ -677,6 +678,82 @@ function Tabs({ tabs, active, onChange, rideMode, mobile }) {
   );
 }
 
+function DayPhotoTab({ days, photosByDay, onUpload, onPreview, onRemove }) {
+  const inputRefs = useRef({});
+
+  return (
+    <div>
+      <div className="section-card" style={{ marginBottom:16 }}>
+        <div style={{ fontSize:13, color:"var(--muted)", marginBottom:8 }}>每日实景</div>
+        <div style={{ fontSize:24, fontWeight:900, marginBottom:8 }}>按天上传实景照片</div>
+        <div style={{ fontSize:14, color:"var(--muted)", lineHeight:1.8 }}>
+          图片保存在当前浏览器本地，适合你自己整理每天的路况、天气和打卡照片。支持缩略图预览和大图查看。
+        </div>
+      </div>
+
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(260px,1fr))", gap:12 }}>
+        {days.map((day, index) => {
+          const photos = photosByDay[day.day] || [];
+          return (
+            <div key={day.day} className="section-card" style={{ padding:16 }}>
+              <div style={{ display:"flex", justifyContent:"space-between", gap:8, alignItems:"flex-start", marginBottom:12 }}>
+                <div>
+                  <div style={{ fontSize:15, fontWeight:900 }}>{day.day} · {day.from} → {day.to}</div>
+                  <div style={{ fontSize:12, color:"var(--muted)", marginTop:4 }}>{day.km} km · {photos.length} 张图片</div>
+                </div>
+                <button className="btn btn-primary" onClick={() => inputRefs.current[day.day]?.click()}>
+                  上传
+                </button>
+              </div>
+
+              <input
+                ref={(node) => { inputRefs.current[day.day] = node; }}
+                type="file"
+                accept="image/*"
+                multiple
+                style={{ display:"none" }}
+                onChange={(event) => onUpload(day.day, event)}
+              />
+
+              {photos.length ? (
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(2, minmax(0,1fr))", gap:8 }}>
+                  {photos.map((photo) => (
+                    <div key={photo.id} style={{ position:"relative", borderRadius:14, overflow:"hidden", background:"var(--card)", border:"1px solid var(--border)" }}>
+                      <img
+                        src={photo.dataUrl}
+                        alt={photo.name}
+                        style={{ width:"100%", aspectRatio:"4 / 3", objectFit:"cover", display:"block", cursor:"pointer" }}
+                        onClick={() => onPreview(photo)}
+                      />
+                      <div style={{ position:"absolute", left:8, right:8, bottom:8, display:"flex", justifyContent:"space-between", gap:6, alignItems:"center" }}>
+                        <div style={{ padding:"4px 8px", borderRadius:999, background:"rgba(7,17,28,0.68)", color:"#fff", fontSize:11, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
+                          {photo.name}
+                        </div>
+                        <button
+                          onClick={() => onRemove(day.day, photo.id)}
+                          style={{ border:"none", borderRadius:999, width:28, height:28, background:"rgba(232,93,74,0.88)", color:"#fff", cursor:"pointer", fontWeight:900 }}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div style={{ padding:"26px 14px", borderRadius:14, border:"1px dashed var(--border)", color:"var(--muted)", fontSize:13, textAlign:"center", lineHeight:1.7 }}>
+                  当前还没有图片
+                  <br />
+                  建议按天上传路况、天气、垭口和住宿实景
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function PwaMeta({ onInstallReady }) {
   useEffect(() => {
     const head = document.head;
@@ -749,6 +826,8 @@ function App() {
   const [gpxMessage, setGpxMessage] = useState("未导入 GPX，当前显示官方建议路线");
   const [installEvent, setInstallEvent] = useState(null);
   const [online, setOnline] = useState(typeof navigator !== "undefined" ? navigator.onLine : true);
+  const [dayPhotos, setDayPhotos] = useState({});
+  const [previewPhoto, setPreviewPhoto] = useState(null);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -759,6 +838,7 @@ function App() {
     setTab(loadLocal(STORAGE_KEYS.tab, "route"));
     setRideMode(loadLocal(STORAGE_KEYS.rideMode, false));
     setImportedTracks(loadLocal(STORAGE_KEYS.gpxTracks, []));
+    setDayPhotos(loadLocal(STORAGE_KEYS.dayPhotos, {}));
   }, []);
 
   useEffect(() => saveLocal(STORAGE_KEYS.checkedEquip, checkedEquip), [checkedEquip]);
@@ -768,6 +848,7 @@ function App() {
   useEffect(() => saveLocal(STORAGE_KEYS.tab, tab), [tab]);
   useEffect(() => saveLocal(STORAGE_KEYS.rideMode, rideMode), [rideMode]);
   useEffect(() => saveLocal(STORAGE_KEYS.gpxTracks, importedTracks), [importedTracks]);
+  useEffect(() => saveLocal(STORAGE_KEYS.dayPhotos, dayPhotos), [dayPhotos]);
 
   useEffect(() => {
     const updateViewport = () => setMobile(window.innerWidth <= 820);
@@ -798,6 +879,7 @@ function App() {
   const nextDay = DAYS[Math.min(activeDay + 1, DAYS.length - 1)];
   const tabs = [
     { id:"route", icon:"🗺️", label:"路书" },
+    { id:"photos", icon:"🖼️", label:"实景" },
     { id:"tips", icon:"📒", label:"经验" },
     { id:"equip", icon:"🎒", label:"装备" },
     { id:"emergency", icon:"🆘", label:"应急" },
@@ -828,6 +910,40 @@ function App() {
   const clearGpx = () => {
     setImportedTracks([]);
     setGpxMessage("已清除 GPX，显示官方建议路线");
+  };
+
+  const handlePhotoUpload = async (dayKey, event) => {
+    const files = Array.from(event.target.files || []);
+    if (!files.length) return;
+
+    const readFile = (file) => new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve({
+        id: `${dayKey}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        name: file.name,
+        dataUrl: reader.result,
+      });
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+    try {
+      const nextPhotos = await Promise.all(files.map(readFile));
+      setDayPhotos((prev) => ({
+        ...prev,
+        [dayKey]: [...(prev[dayKey] || []), ...nextPhotos],
+      }));
+    } finally {
+      event.target.value = "";
+    }
+  };
+
+  const handlePhotoRemove = (dayKey, photoId) => {
+    setDayPhotos((prev) => ({
+      ...prev,
+      [dayKey]: (prev[dayKey] || []).filter((photo) => photo.id !== photoId),
+    }));
+    if (previewPhoto?.id === photoId) setPreviewPhoto(null);
   };
 
   const toggleEquip = (key) => setCheckedEquip((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -1226,56 +1342,17 @@ function App() {
                 </div>
               </div>
 
-              <div className="section-card">
-                <div style={{ fontSize:13, color:"var(--muted)", marginBottom:8 }}>每日图片 / 实景卡片</div>
-                <div style={{ fontSize:20, fontWeight:900, marginBottom:14 }}>按地貌变化建立视觉记忆</div>
-                <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(240px,1fr))", gap:12 }}>
-                  {PHOTO_STORIES.map((story) => (
-                    <div key={story.day} style={{ borderRadius:18, overflow:"hidden", background:"var(--card)", border:"1px solid var(--border)" }}>
-                      <div style={{ height:180, position:"relative", background:story.sky }}>
-                        <div style={{
-                          position:"absolute",
-                          left:0,
-                          right:0,
-                          bottom:0,
-                          height:"48%",
-                          background:story.terrain,
-                          clipPath:"polygon(0 100%, 0 46%, 18% 58%, 33% 34%, 47% 54%, 62% 28%, 75% 48%, 100% 18%, 100% 100%)"
-                        }} />
-                        <div style={{
-                          position:"absolute",
-                          left:"10%",
-                          right:"12%",
-                          bottom:"24%",
-                          height:3,
-                          background:story.accent,
-                          boxShadow:`0 0 0 2px rgba(7,17,28,.18), 0 0 18px ${story.accent}`,
-                          transform:"rotate(-12deg)"
-                        }} />
-                        <div style={{
-                          position:"absolute",
-                          right:16,
-                          top:14,
-                          padding:"6px 10px",
-                          borderRadius:999,
-                          background:"rgba(7,17,28,.46)",
-                          color:"#fff",
-                          fontSize:12,
-                          fontWeight:900,
-                          backdropFilter:"blur(8px)"
-                        }}>
-                          {story.day}
-                        </div>
-                      </div>
-                      <div style={{ padding:14 }}>
-                        <div style={{ fontSize:16, fontWeight:900, marginBottom:8 }}>{story.title}</div>
-                        <div style={{ fontSize:13, color:"var(--muted)", lineHeight:1.7 }}>{story.caption}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
+          )}
+
+          {tab === "photos" && (
+            <DayPhotoTab
+              days={DAYS}
+              photosByDay={dayPhotos}
+              onUpload={handlePhotoUpload}
+              onPreview={setPreviewPhoto}
+              onRemove={handlePhotoRemove}
+            />
           )}
 
           {tab === "equip" && (
@@ -1442,6 +1519,40 @@ function App() {
           川藏 G318 ADV 摩旅路书 · 支持手机骑行模式、GPX 导入与离线安装
         </div>
       </div>
+
+      {previewPhoto && (
+        <div
+          onClick={() => setPreviewPhoto(null)}
+          style={{
+            position:"fixed",
+            inset:0,
+            background:"rgba(5,12,20,0.88)",
+            display:"flex",
+            alignItems:"center",
+            justifyContent:"center",
+            zIndex:80,
+            padding:20,
+          }}
+        >
+          <div
+            onClick={(event) => event.stopPropagation()}
+            style={{
+              maxWidth:"min(96vw, 1100px)",
+              width:"100%",
+              background:"rgba(15,20,28,0.96)",
+              border:"1px solid var(--border)",
+              borderRadius:20,
+              overflow:"hidden",
+            }}
+          >
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", gap:12, padding:"14px 16px", borderBottom:"1px solid var(--border)" }}>
+              <div style={{ fontSize:14, fontWeight:800 }}>{previewPhoto.name}</div>
+              <button className="btn btn-soft" onClick={() => setPreviewPhoto(null)}>关闭</button>
+            </div>
+            <img src={previewPhoto.dataUrl} alt={previewPhoto.name} style={{ width:"100%", maxHeight:"78vh", objectFit:"contain", display:"block", background:"#050c14" }} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
