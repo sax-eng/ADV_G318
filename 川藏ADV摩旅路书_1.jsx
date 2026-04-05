@@ -586,7 +586,7 @@ function RouteMap({ activeDay, importedTracks, onSelectDay }) {
           if (!SCHEMATIC_DISTANCE_LABEL_INDICES.has(index + 1)) return null;
           const prev = points[index];
           const midX = (prev.x + point.x) / 2;
-          const midY = ((prev.y + point.y) / 2) + (index % 2 === 0 ? -8 : 10);
+          const midY = (prev.y + point.y) / 2;
           return (
             <text key={`${prev.name}-${point.name}`} x={midX} y={midY} textAnchor="middle" fill="rgba(255,240,214,0.9)" fontSize="13" fontStyle="italic">
               {point.dist}km
