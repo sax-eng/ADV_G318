@@ -173,6 +173,80 @@ const CHECKLIST_PERSON = [
   "体检（心肺功能）","保险（意外险 + 高原附加 + 商业险）","紧急联系人互换","离线地图下载","急救知识培训（CPR）","气象预报跟踪"
 ];
 
+const COST_BREAKDOWN = [
+  { label:"燃油", amount:1850, note:"按 2150km 主线 + 山区油耗浮动估算" },
+  { label:"住宿", amount:2200, note:"11 晚，县城和镇上混合标准" },
+  { label:"餐饮", amount:1100, note:"按 12 天骑行 + 2 天机动估算" },
+  { label:"门票/停车/杂费", amount:500, note:"观景点、小修小补、停车和临时采购" },
+  { label:"应急预备金", amount:1500, note:"拖车、改住、补胎、药品和天气绕行" },
+];
+
+const SUPPLY_RHYTHM = [
+  { title:"加油节奏", desc:"过康定后不要等亮灯再找油。芒康、左贡、邦达、然乌这些节点默认加满。" },
+  { title:"补水节奏", desc:"高海拔阶段别等口渴再喝水，每次休息固定补水和补糖。" },
+  { title:"餐食节奏", desc:"午饭别拖太晚，避免下午在高海拔路段空腹和低糖。" },
+  { title:"现金与支付", desc:"电子支付足够覆盖大多数场景，但队内至少留一笔离线现金兜底。" },
+];
+
+const PHOTO_STORIES = [
+  {
+    day: "D1",
+    title: "成都出发，进入山线",
+    caption: "城市边界逐渐退场，雅安之后正式切入川西山线节奏。",
+    sky: "linear-gradient(180deg, #9fd3ff 0%, #dff3ff 36%, #335b7a 100%)",
+    terrain: "linear-gradient(180deg, #3f6d5a 0%, #243f35 100%)",
+    accent: "#8ed0ff",
+  },
+  {
+    day: "D2",
+    title: "折多山第一次抬升",
+    caption: "从河谷一路抬升到垭口，视野和温度同时变化，是身体真正开始适应高海拔的一天。",
+    sky: "linear-gradient(180deg, #7dc2ff 0%, #d8efff 34%, #6e7d90 100%)",
+    terrain: "linear-gradient(180deg, #726b58 0%, #4f4636 100%)",
+    accent: "#ffd28a",
+  },
+  {
+    day: "D3",
+    title: "高原平台拉开",
+    caption: "连续翻越高海拔垭口，天空更近，风更直，理塘的空旷感会非常直接。",
+    sky: "linear-gradient(180deg, #6db6ff 0%, #dcecff 38%, #7d8aa2 100%)",
+    terrain: "linear-gradient(180deg, #98815d 0%, #66513a 100%)",
+    accent: "#ffe099",
+  },
+  {
+    day: "D5",
+    title: "跨江入藏，山势变硬",
+    caption: "从巴塘过金沙江进入西藏，路感和心理感受都会明显变化。",
+    sky: "linear-gradient(180deg, #8cc8ff 0%, #eef7ff 34%, #6c6f78 100%)",
+    terrain: "linear-gradient(180deg, #7b6352 0%, #43352d 100%)",
+    accent: "#ffb38e",
+  },
+  {
+    day: "D6",
+    title: "怒江七十二拐",
+    caption: "连续发卡弯和巨大落差，是全线最有压迫感、也最考验控车的一段。",
+    sky: "linear-gradient(180deg, #8abfff 0%, #d7eaff 35%, #616a76 100%)",
+    terrain: "linear-gradient(180deg, #8c725c 0%, #503f34 100%)",
+    accent: "#ffbb7f",
+  },
+  {
+    day: "D7-D8",
+    title: "然乌到波密，色彩回归",
+    caption: "湖水、林线、云墙和潮湿空气一起回来，视觉上是全线最舒展的一段。",
+    sky: "linear-gradient(180deg, #7ad0ff 0%, #daf8ff 34%, #4f7487 100%)",
+    terrain: "linear-gradient(180deg, #447b61 0%, #284f40 100%)",
+    accent: "#7ff0c1",
+  },
+  {
+    day: "D11",
+    title: "米拉山之后，收束进拉萨",
+    caption: "翻过最后一个大垭口后，整趟旅程开始从挑战切回收官。",
+    sky: "linear-gradient(180deg, #8cc6ff 0%, #edf6ff 34%, #7e7f8b 100%)",
+    terrain: "linear-gradient(180deg, #8b7a5a 0%, #564833 100%)",
+    accent: "#d5c084",
+  },
+];
+
 const EXPERIENCE_SECTIONS = [
   {
     id: "timing",
@@ -813,6 +887,40 @@ function App() {
           </div>
         )}
 
+        {!rideMode && (
+          <div className="route-grid" style={{ marginBottom:18 }}>
+            <div className="section-card">
+              <div style={{ fontSize:13, color:"var(--muted)", marginBottom:8 }}>费用与补给</div>
+              <div style={{ fontSize:24, fontWeight:900, marginBottom:8 }}>按主线骑行准备一笔够稳的预算</div>
+              <div style={{ fontSize:14, color:"var(--muted)", lineHeight:1.8, marginBottom:14 }}>
+                预算不是为了精确到个位，而是为了避免你在高海拔和偏远路段因为“省这一点”而压缩休息、错过加油或硬扛车况问题。
+              </div>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(150px,1fr))", gap:10 }}>
+                <div style={{ padding:14, borderRadius:14, background:"var(--card)" }}>
+                  <div style={{ fontSize:12, color:"var(--muted)", marginBottom:6 }}>基础预算</div>
+                  <div style={{ fontSize:22, fontWeight:900 }}>¥{COST_BREAKDOWN.reduce((sum, item) => sum + item.amount, 0).toLocaleString()}</div>
+                </div>
+                <div style={{ padding:14, borderRadius:14, background:"var(--card)" }}>
+                  <div style={{ fontSize:12, color:"var(--muted)", marginBottom:6 }}>建议备用金</div>
+                  <div style={{ fontSize:22, fontWeight:900 }}>¥1,500+</div>
+                </div>
+                <div style={{ padding:14, borderRadius:14, background:"var(--card)" }}>
+                  <div style={{ fontSize:12, color:"var(--muted)", marginBottom:6 }}>油料策略</div>
+                  <div style={{ fontSize:13, lineHeight:1.7 }}>进高海拔后默认“路过能加就加”。</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="section-card">
+              <div style={{ fontSize:13, color:"var(--muted)", marginBottom:8 }}>每日实景</div>
+              <div style={{ fontSize:24, fontWeight:900, marginBottom:8 }}>把路线变成有地貌变化感的故事</div>
+              <div style={{ fontSize:14, color:"var(--muted)", lineHeight:1.8 }}>
+                这里不是照片图库，而是给骑行前快速建立“今天会看到什么、会经历什么”的视觉预期。
+              </div>
+            </div>
+          </div>
+        )}
+
         {rideMode && (
           <div className="hud">
             <div className="hud-card">
@@ -1020,6 +1128,83 @@ function App() {
                   </div>
                 </div>
               ))}
+
+              <div className="route-grid" style={{ marginTop:18, marginBottom:18 }}>
+                <div className="section-card">
+                  <div style={{ fontSize:13, color:"var(--muted)", marginBottom:8 }}>费用拆分</div>
+                  <div style={{ fontSize:20, fontWeight:900, marginBottom:12 }}>基础预算建议</div>
+                  {COST_BREAKDOWN.map((item) => (
+                    <div key={item.label} style={{ display:"flex", justifyContent:"space-between", gap:12, padding:"12px 14px", borderRadius:14, background:"var(--card)", marginBottom:10 }}>
+                      <div>
+                        <div style={{ fontSize:14, fontWeight:900 }}>{item.label}</div>
+                        <div style={{ fontSize:12, color:"var(--muted)", marginTop:4, lineHeight:1.6 }}>{item.note}</div>
+                      </div>
+                      <div style={{ fontSize:18, fontWeight:900, whiteSpace:"nowrap" }}>¥{item.amount.toLocaleString()}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="section-card">
+                  <div style={{ fontSize:13, color:"var(--muted)", marginBottom:8 }}>补给策略</div>
+                  <div style={{ fontSize:20, fontWeight:900, marginBottom:12 }}>把节奏固定下来</div>
+                  {SUPPLY_RHYTHM.map((item) => (
+                    <div key={item.title} style={{ padding:"12px 14px", borderRadius:14, background:"var(--card)", marginBottom:10 }}>
+                      <div style={{ fontSize:14, fontWeight:900, marginBottom:6 }}>{item.title}</div>
+                      <div style={{ fontSize:13, color:"var(--muted)", lineHeight:1.7 }}>{item.desc}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="section-card">
+                <div style={{ fontSize:13, color:"var(--muted)", marginBottom:8 }}>每日图片 / 实景卡片</div>
+                <div style={{ fontSize:20, fontWeight:900, marginBottom:14 }}>按地貌变化建立视觉记忆</div>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(240px,1fr))", gap:12 }}>
+                  {PHOTO_STORIES.map((story) => (
+                    <div key={story.day} style={{ borderRadius:18, overflow:"hidden", background:"var(--card)", border:"1px solid var(--border)" }}>
+                      <div style={{ height:180, position:"relative", background:story.sky }}>
+                        <div style={{
+                          position:"absolute",
+                          left:0,
+                          right:0,
+                          bottom:0,
+                          height:"48%",
+                          background:story.terrain,
+                          clipPath:"polygon(0 100%, 0 46%, 18% 58%, 33% 34%, 47% 54%, 62% 28%, 75% 48%, 100% 18%, 100% 100%)"
+                        }} />
+                        <div style={{
+                          position:"absolute",
+                          left:"10%",
+                          right:"12%",
+                          bottom:"24%",
+                          height:3,
+                          background:story.accent,
+                          boxShadow:`0 0 0 2px rgba(7,17,28,.18), 0 0 18px ${story.accent}`,
+                          transform:"rotate(-12deg)"
+                        }} />
+                        <div style={{
+                          position:"absolute",
+                          right:16,
+                          top:14,
+                          padding:"6px 10px",
+                          borderRadius:999,
+                          background:"rgba(7,17,28,.46)",
+                          color:"#fff",
+                          fontSize:12,
+                          fontWeight:900,
+                          backdropFilter:"blur(8px)"
+                        }}>
+                          {story.day}
+                        </div>
+                      </div>
+                      <div style={{ padding:14 }}>
+                        <div style={{ fontSize:16, fontWeight:900, marginBottom:8 }}>{story.title}</div>
+                        <div style={{ fontSize:13, color:"var(--muted)", lineHeight:1.7 }}>{story.caption}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
 
