@@ -43,6 +43,37 @@ const ROUTE_POINTS = [
   { name:"拉萨", day:11, lat:29.6520, lon:91.1721, alt:3650 },
 ];
 
+const ROUTE_SCHEMATIC_NODES = [
+  { name:"成都", alt:512, dist:0, type:"city", day:1 },
+  { name:"雅安", alt:641, dist:151, type:"city", day:1 },
+  { name:"二郎山", alt:2170, dist:88, type:"pass", day:1 },
+  { name:"泸定", alt:1330, dist:50, type:"city", day:1 },
+  { name:"康定", alt:2530, dist:51, type:"city", day:2 },
+  { name:"折多山", alt:4298, dist:72, type:"pass", day:2 },
+  { name:"新都桥", alt:3460, dist:83, type:"city", day:2 },
+  { name:"雅江", alt:2530, dist:132, type:"city", day:3 },
+  { name:"卡子拉山", alt:4718, dist:132, type:"pass", day:3 },
+  { name:"理塘", alt:4014, dist:132, type:"city", day:3 },
+  { name:"海子山", alt:4685, dist:174, type:"pass", day:4 },
+  { name:"巴塘", alt:2580, dist:174, type:"city", day:4 },
+  { name:"芒康", alt:3875, dist:107, type:"city", day:5 },
+  { name:"拉乌山", alt:4338, dist:49, type:"pass", day:5 },
+  { name:"东达山", alt:5008, dist:44, type:"pass", day:5 },
+  { name:"左贡", alt:3877, dist:114, type:"city", day:5 },
+  { name:"业拉山", alt:4658, dist:109, type:"pass", day:6 },
+  { name:"邦达", alt:4120, dist:97, type:"city", day:6 },
+  { name:"八宿", alt:3280, dist:97, type:"city", day:6 },
+  { name:"然乌", alt:3960, dist:92, type:"city", day:7 },
+  { name:"波密", alt:2725, dist:131, type:"city", day:7 },
+  { name:"通麦", alt:2070, dist:47, type:"pass", day:8 },
+  { name:"鲁朗", alt:3285, dist:48, type:"city", day:8 },
+  { name:"林芝", alt:2930, dist:75, type:"city", day:8 },
+  { name:"工布江达", alt:3440, dist:130, type:"city", day:10 },
+  { name:"墨竹工卡", alt:3823, dist:99, type:"city", day:11 },
+  { name:"米拉山", alt:5013, dist:116, type:"pass", day:11 },
+  { name:"拉萨", alt:3650, dist:69, type:"city", day:11 },
+];
+
 const EQUIPMENT = {
   "个人骑行装备": {
     icon: "🏍️",
@@ -363,32 +394,28 @@ function getBounds(points) {
   }), { minLat: Infinity, maxLat: -Infinity, minLon: Infinity, maxLon: -Infinity });
 }
 
-function projectPoint(point, bounds, width, height, padding) {
-  const lonSpan = Math.max(bounds.maxLon - bounds.minLon, 0.1);
-  const latSpan = Math.max(bounds.maxLat - bounds.minLat, 0.1);
-  const x = width - padding - ((point.lon - bounds.minLon) / lonSpan) * (width - padding * 2);
-  const y = height - padding - ((point.lat - bounds.minLat) / latSpan) * (height - padding * 2);
-  return { x, y };
+function getSchematicLayout(nodes, width, height, padding) {
+  const totalDistance = nodes.reduce((sum, node) => sum + node.dist, 0);
+  const maxAlt = Math.max(...nodes.map((node) => node.alt));
+  const minAlt = Math.min(...nodes.map((node) => node.alt));
+  const chartHeight = height - padding * 2;
+  let cumulative = 0;
+
+  return nodes.map((node) => {
+    cumulative += node.dist;
+    const x = padding + (cumulative / totalDistance) * (width - padding * 2);
+    const y = height - padding - ((node.alt - minAlt) / (maxAlt - minAlt || 1)) * chartHeight * 0.72 - chartHeight * 0.06;
+    return { ...node, x, y };
+  });
 }
 
-function pointsToPath(points, bounds, width, height, padding) {
+function buildSmoothPath(points) {
   return points.map((point, index) => {
-    const { x, y } = projectPoint(point, bounds, width, height, padding);
-    return `${index === 0 ? "M" : "L"} ${x.toFixed(1)} ${y.toFixed(1)}`;
+    if (index === 0) return `M ${point.x.toFixed(1)} ${point.y.toFixed(1)}`;
+    const prev = points[index - 1];
+    const midX = ((prev.x + point.x) / 2).toFixed(1);
+    return `C ${midX} ${prev.y.toFixed(1)}, ${midX} ${point.y.toFixed(1)}, ${point.x.toFixed(1)} ${point.y.toFixed(1)}`;
   }).join(" ");
-}
-
-function getRouteSegments(points) {
-  const segments = [];
-  for (let day = 1; day <= 11; day += 1) {
-    const segment = points.filter((p) => p.day === day || (day > 1 && p.day === day - 1 && p.name === DAYS[day - 1].from));
-    const unique = [];
-    segment.forEach((point) => {
-      if (!unique.find((entry) => entry.name === point.name)) unique.push(point);
-    });
-    if (unique.length > 1) segments.push({ day, points: unique });
-  }
-  return segments;
 }
 
 function parseGpxText(text) {
@@ -505,86 +532,81 @@ function ElevationChart({ days, activeDay, onSelect }) {
 }
 
 function RouteMap({ activeDay, importedTracks, onSelectDay }) {
-  const width = 900;
-  const height = 520;
-  const padding = 48;
-  const allPoints = ROUTE_POINTS.concat(importedTracks.flatMap((track) => track.points));
-  const bounds = getBounds(allPoints);
-  const officialPath = pointsToPath(ROUTE_POINTS, bounds, width, height, padding);
-  const segments = getRouteSegments(ROUTE_POINTS);
+  const width = 1280;
+  const height = 560;
+  const padding = 52;
+  const points = getSchematicLayout(ROUTE_SCHEMATIC_NODES, width, height, padding);
+  const officialPath = buildSmoothPath(points);
 
   return (
     <div style={{ background:"linear-gradient(180deg, rgba(9,16,26,0.86), rgba(9,16,26,1))", borderRadius:18, border:"1px solid var(--border)", overflow:"hidden" }}>
       <div style={{ padding:"14px 16px", display:"flex", justifyContent:"space-between", alignItems:"center", borderBottom:"1px solid rgba(133,155,178,0.16)" }}>
         <div>
           <div style={{ fontSize:13, color:"var(--muted)", marginBottom:4 }}>川藏路线图</div>
-          <div style={{ fontSize:17, fontWeight:800 }}>成都 → 拉萨 · G318 主线</div>
+          <div style={{ fontSize:17, fontWeight:800 }}>成都 → 拉萨 · 示意线路图</div>
         </div>
         <div style={{ display:"flex", gap:8, flexWrap:"wrap", justifyContent:"flex-end" }}>
-          <span className="chip">官方路线</span>
-          {importedTracks.length > 0 && <span className="chip chip-track">GPX {importedTracks.length} 条</span>}
+          <span className="chip">示意图风格</span>
+          {importedTracks.length > 0 && <span className="chip chip-track">GPX 已导入 {importedTracks.length} 条</span>}
         </div>
       </div>
 
-      <svg viewBox={`0 0 ${width} ${height}`} style={{ width:"100%", display:"block", background:"radial-gradient(circle at 20% 20%, rgba(59,158,255,0.08), transparent 32%), radial-gradient(circle at 70% 20%, rgba(18,219,155,0.08), transparent 24%), linear-gradient(180deg, rgba(255,255,255,0.02), transparent)" }}>
-        {Array.from({ length: 5 }).map((_, i) => (
-          <line key={`v-${i}`} x1={padding + i * ((width - padding * 2) / 4)} x2={padding + i * ((width - padding * 2) / 4)} y1={padding} y2={height - padding} stroke="rgba(127,145,164,0.12)" strokeDasharray="6 8" />
-        ))}
-        {Array.from({ length: 4 }).map((_, i) => (
-          <line key={`h-${i}`} y1={padding + i * ((height - padding * 2) / 3)} y2={padding + i * ((height - padding * 2) / 3)} x1={padding} x2={width - padding} stroke="rgba(127,145,164,0.12)" strokeDasharray="6 8" />
-        ))}
+      <svg viewBox={`0 0 ${width} ${height}`} style={{ width:"100%", display:"block", background:"linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015))" }}>
+        <text x={padding} y="42" fill="rgba(236,243,250,0.9)" fontSize="26" fontWeight="900">《川藏南线示意图》</text>
 
-        <path d={officialPath} fill="none" stroke="rgba(18,219,155,0.18)" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
-        <path d={officialPath} fill="none" stroke="var(--accent)" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" />
+        <path d={officialPath} fill="none" stroke="rgba(75,177,255,0.18)" strokeWidth="16" strokeLinecap="round" strokeLinejoin="round" />
+        <path d={officialPath} fill="none" stroke="#4ba7ff" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" />
 
-        {segments.map((segment) => {
-          const dayIndex = segment.day - 1;
-          const isActive = dayIndex === activeDay;
-          const path = pointsToPath(segment.points, bounds, width, height, padding);
+        {points.slice(1).map((point, index) => {
+          const prev = points[index];
+          const midX = (prev.x + point.x) / 2;
+          const midY = Math.min(prev.y, point.y) - 22;
           return (
-            <path
-              key={segment.day}
-              d={path}
-              fill="none"
-              stroke={isActive ? "var(--warn)" : "rgba(255,255,255,0)"}
-              strokeWidth={isActive ? 7 : 0}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              style={{ cursor:"pointer", transition:"all .2s" }}
-              onClick={() => onSelectDay(dayIndex)}
-            />
+            <text key={`${prev.name}-${point.name}`} x={midX} y={midY} textAnchor="middle" fill="rgba(255,240,214,0.92)" fontSize="16" fontStyle="italic">
+              {point.dist}km
+            </text>
           );
         })}
 
-        {importedTracks.map((track, index) => (
-          <path
-            key={track.id}
-            d={pointsToPath(track.points, bounds, width, height, padding)}
-            fill="none"
-            stroke={index % 2 === 0 ? "#F5A623" : "#8E6CFF"}
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeDasharray="10 8"
-            opacity="0.9"
-          />
-        ))}
+        {points.map((point) => {
+          const isPass = point.type === "pass";
+          const isActive = point.day - 1 === activeDay;
+          const isCity = point.type === "city";
+          const labelColor = isPass ? "#8bc9ff" : "#2e96ff";
+          const altY = isPass ? point.y - 30 : point.y - 22;
+          const nameY = isCity ? point.y + 56 : point.y - 48;
+          const rotation = isCity ? 0 : 0;
 
-        {ROUTE_POINTS.map((point, index) => {
-          const { x, y } = projectPoint(point, bounds, width, height, padding);
-          const isMajor = index === 0 || index === ROUTE_POINTS.length - 1 || point.name === DAYS[activeDay].from || point.name === DAYS[activeDay].to;
           return (
             <g key={point.name} style={{ cursor:"pointer" }} onClick={() => onSelectDay(Math.max(0, point.day - 1))}>
-              <circle cx={x} cy={y} r={isMajor ? 6 : 4} fill={isMajor ? "var(--warn)" : "var(--text)"} stroke="var(--bg)" strokeWidth="2" />
-              {isMajor && (
-                <g>
-                  <rect x={x + 10} y={y - 18} rx="8" ry="8" width={point.name.length * 14 + 18} height="24" fill="rgba(10,18,28,0.88)" stroke="rgba(255,255,255,0.12)" />
-                  <text x={x + 20} y={y - 2} fill="var(--text)" fontSize="12" fontWeight="700">{point.name}</text>
-                </g>
+              <circle cx={point.x} cy={point.y} r={isActive ? 8 : 6} fill={isActive ? "var(--warn)" : "#f2dfd3"} stroke="#c77f59" strokeWidth="2.5" />
+              {isPass && (
+                <path d={`M ${point.x - 18} ${point.y + 18} L ${point.x - 6} ${point.y - 6} L ${point.x + 2} ${point.y + 10} L ${point.x + 14} ${point.y - 14} L ${point.x + 26} ${point.y + 18}`} fill="none" stroke="#2a95ff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" opacity="0.9" />
+              )}
+              <text x={point.x} y={altY} textAnchor="middle" fill="rgba(236,243,250,0.92)" fontSize="14" fontWeight="700">
+                {point.alt}
+              </text>
+              <text
+                x={point.x}
+                y={nameY}
+                textAnchor="middle"
+                fill={labelColor}
+                fontSize={isCity ? 20 : 16}
+                fontWeight="900"
+                transform={rotation ? `rotate(${rotation} ${point.x} ${nameY})` : undefined}
+              >
+                {point.name}
+              </text>
+              {isActive && (
+                <circle cx={point.x} cy={point.y} r="14" fill="none" stroke="rgba(245,166,35,0.42)" strokeWidth="3" />
               )}
             </g>
           );
         })}
+
+        <text x={padding} y={height - 18} fill="rgba(157,176,196,0.88)" fontSize="13">
+          按成都 → 拉萨方向绘制，参考川藏南线线路示意图样式重构；用于路书阅读，不用于精确导航。
+        </text>
       </svg>
     </div>
   );
