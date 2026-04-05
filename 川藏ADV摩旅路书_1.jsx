@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+const { useState, useEffect, useRef } = React;
 
 const DAYS = [
   { day:"D1", from:"成都", to:"泸定", km:280, road:"成雅高速 + G318，雅安后进入盘山段", altStart:500, altEnd:1330, altMax:1330, altMaxName:"泸定", nodes:"成都 → 雅安 → 天全 → 二郎山隧道 → 泸定", fuel:"雅安、天全", stay:"泸定县城宾馆", warn:"二郎山隧道内湿滑，出隧道后温差大，注意起雾", difficulty:1 },
