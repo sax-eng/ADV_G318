@@ -223,7 +223,7 @@ function getBounds(points) {
 function projectPoint(point, bounds, width, height, padding) {
   const lonSpan = Math.max(bounds.maxLon - bounds.minLon, 0.1);
   const latSpan = Math.max(bounds.maxLat - bounds.minLat, 0.1);
-  const x = padding + ((point.lon - bounds.minLon) / lonSpan) * (width - padding * 2);
+  const x = width - padding - ((point.lon - bounds.minLon) / lonSpan) * (width - padding * 2);
   const y = height - padding - ((point.lat - bounds.minLat) / latSpan) * (height - padding * 2);
   return { x, y };
 }
