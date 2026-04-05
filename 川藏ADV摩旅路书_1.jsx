@@ -497,10 +497,17 @@ function PwaMeta({ onInstallReady }) {
     appleIcon.setAttribute("href", "./pwa-icon.svg");
     head.appendChild(appleIcon);
 
+    // v1 prioritizes reliability over offline caching. Auto-remove any old
+    // service workers and caches so users do not need to clear mobile cache manually.
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("./sw.js").then((registration) => {
-        if (registration.waiting) registration.waiting.postMessage({ type: "SKIP_WAITING" });
-      }).catch(() => {});
+      navigator.serviceWorker.getRegistrations().then((registrations) => (
+        Promise.all(registrations.map((registration) => registration.unregister()))
+      )).catch(() => {});
+    }
+    if ("caches" in window) {
+      window.caches.keys().then((keys) => (
+        Promise.all(keys.filter((key) => key.startsWith("g318-adv-pwa")).map((key) => window.caches.delete(key)))
+      )).catch(() => {});
     }
 
     const onBeforeInstallPrompt = (event) => {
