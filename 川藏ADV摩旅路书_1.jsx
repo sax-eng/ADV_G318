@@ -576,8 +576,8 @@ function RouteMap({ activeDay, importedTracks, onSelectDay }) {
 
       <svg viewBox={`0 0 ${width} ${height}`} style={{ width:"100%", display:"block", background:"linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015))" }}>
         <text x={padding} y="42" fill="rgba(236,243,250,0.9)" fontSize="26" fontWeight="900">《川藏南线示意图》</text>
-        <VerticalLabel text="四川段" x="220" y="68" color="rgba(125,182,255,0.55)" fontSize={14} gap={16} />
-        <VerticalLabel text="西藏段" x="820" y="68" color="rgba(125,182,255,0.55)" fontSize={14} gap={16} />
+        <text x="470" y="172" fill="rgba(245,166,35,0.92)" fontSize="20" fontWeight="900" textAnchor="middle">四川段</text>
+        <text x="1040" y="172" fill="rgba(245,166,35,0.92)" fontSize="20" fontWeight="900" textAnchor="middle">西藏段</text>
 
         <path d={officialPath} fill="none" stroke="rgba(75,177,255,0.18)" strokeWidth="16" strokeLinecap="round" strokeLinejoin="round" />
         <path d={officialPath} fill="none" stroke="#4ba7ff" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" />
