@@ -418,6 +418,18 @@ function buildSmoothPath(points) {
   }).join(" ");
 }
 
+function VerticalLabel({ text, x, y, color, fontSize, gap = 22 }) {
+  return (
+    <text x={x} y={y} textAnchor="middle" fill={color} fontSize={fontSize} fontWeight="900">
+      {text.split("").map((char, index) => (
+        <tspan key={`${text}-${index}`} x={x} dy={index === 0 ? 0 : gap}>
+          {char}
+        </tspan>
+      ))}
+    </text>
+  );
+}
+
 function parseGpxText(text) {
   const parser = new DOMParser();
   const xml = parser.parseFromString(text, "application/xml");
@@ -586,17 +598,28 @@ function RouteMap({ activeDay, importedTracks, onSelectDay }) {
               <text x={point.x} y={altY} textAnchor="middle" fill="rgba(236,243,250,0.92)" fontSize="14" fontWeight="700">
                 {point.alt}
               </text>
-              <text
-                x={point.x}
-                y={nameY}
-                textAnchor="middle"
-                fill={labelColor}
-                fontSize={isCity ? 20 : 16}
-                fontWeight="900"
-                transform={rotation ? `rotate(${rotation} ${point.x} ${nameY})` : undefined}
-              >
-                {point.name}
-              </text>
+              {isCity ? (
+                <VerticalLabel
+                  text={point.name}
+                  x={point.x}
+                  y={nameY}
+                  color={labelColor}
+                  fontSize={20}
+                  gap={22}
+                />
+              ) : (
+                <text
+                  x={point.x}
+                  y={nameY}
+                  textAnchor="middle"
+                  fill={labelColor}
+                  fontSize={16}
+                  fontWeight="900"
+                  transform={rotation ? `rotate(${rotation} ${point.x} ${nameY})` : undefined}
+                >
+                  {point.name}
+                </text>
+              )}
               {isActive && (
                 <circle cx={point.x} cy={point.y} r="14" fill="none" stroke="rgba(245,166,35,0.42)" strokeWidth="3" />
               )}
