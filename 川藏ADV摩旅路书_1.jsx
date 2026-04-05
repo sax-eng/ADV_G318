@@ -1047,3 +1047,9 @@ function App() {
 }
 
 window.G318RoadbookApp = App;
+
+const mountNode = document.getElementById("root");
+if (mountNode) {
+  const root = ReactDOM.createRoot(mountNode);
+  root.render(<App />);
+}
