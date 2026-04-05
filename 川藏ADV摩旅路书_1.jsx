@@ -44,68 +44,37 @@ const ROUTE_POINTS = [
 ];
 
 const ROUTE_SCHEMATIC_NODES = [
-  { name:"成都", alt:512, dist:0, type:"city", day:1 },
-  { name:"雅安", alt:641, dist:151, type:"city", day:1 },
-  { name:"二郎山", alt:2170, dist:88, type:"pass", day:1 },
-  { name:"泸定", alt:1330, dist:50, type:"city", day:1 },
-  { name:"康定", alt:2530, dist:51, type:"city", day:2 },
-  { name:"折多山", alt:4298, dist:72, type:"pass", day:2 },
-  { name:"新都桥", alt:3460, dist:83, type:"city", day:2 },
-  { name:"雅江", alt:2530, dist:132, type:"city", day:3 },
-  { name:"卡子拉山", alt:4718, dist:132, type:"pass", day:3 },
-  { name:"理塘", alt:4014, dist:132, type:"city", day:3 },
-  { name:"海子山", alt:4685, dist:174, type:"pass", day:4 },
-  { name:"巴塘", alt:2580, dist:174, type:"city", day:4 },
-  { name:"芒康", alt:3875, dist:107, type:"city", day:5 },
-  { name:"拉乌山", alt:4338, dist:49, type:"pass", day:5 },
-  { name:"东达山", alt:5008, dist:44, type:"pass", day:5 },
-  { name:"左贡", alt:3877, dist:114, type:"city", day:5 },
-  { name:"业拉山", alt:4658, dist:109, type:"pass", day:6 },
-  { name:"邦达", alt:4120, dist:97, type:"city", day:6 },
-  { name:"八宿", alt:3280, dist:97, type:"city", day:6 },
-  { name:"然乌", alt:3960, dist:92, type:"city", day:7 },
-  { name:"波密", alt:2725, dist:131, type:"city", day:7 },
-  { name:"通麦", alt:2070, dist:47, type:"pass", day:8 },
-  { name:"鲁朗", alt:3285, dist:48, type:"city", day:8 },
-  { name:"林芝", alt:2930, dist:75, type:"city", day:8 },
-  { name:"工布江达", alt:3440, dist:130, type:"city", day:10 },
-  { name:"墨竹工卡", alt:3823, dist:99, type:"city", day:11 },
-  { name:"米拉山", alt:5013, dist:116, type:"pass", day:11 },
-  { name:"拉萨", alt:3650, dist:69, type:"city", day:11 },
+  { name:"成都", alt:512, dist:0, type:"city", day:1, side:"bottom", lane:1 },
+  { name:"雅安", alt:641, dist:151, type:"city", day:1, side:"bottom", lane:0 },
+  { name:"二郎山", alt:2170, dist:88, type:"pass", day:1, side:"top", lane:1 },
+  { name:"泸定", alt:1330, dist:50, type:"city", day:1, side:"bottom", lane:0 },
+  { name:"康定", alt:2530, dist:51, type:"city", day:2, side:"bottom", lane:1 },
+  { name:"折多山", alt:4298, dist:72, type:"pass", day:2, side:"top", lane:0 },
+  { name:"新都桥", alt:3460, dist:83, type:"city", day:2, side:"bottom", lane:0 },
+  { name:"雅江", alt:2530, dist:132, type:"city", day:3, side:"bottom", lane:1 },
+  { name:"卡子拉山", alt:4718, dist:132, type:"pass", day:3, side:"top", lane:0 },
+  { name:"理塘", alt:4014, dist:132, type:"city", day:3, side:"top", lane:1 },
+  { name:"海子山", alt:4685, dist:174, type:"pass", day:4, side:"top", lane:0 },
+  { name:"巴塘", alt:2580, dist:174, type:"city", day:4, side:"bottom", lane:1 },
+  { name:"芒康", alt:3875, dist:107, type:"city", day:5, side:"top", lane:1 },
+  { name:"拉乌山", alt:4338, dist:49, type:"pass", day:5, side:"top", lane:0 },
+  { name:"东达山", alt:5008, dist:44, type:"pass", day:5, side:"top", lane:1 },
+  { name:"左贡", alt:3877, dist:114, type:"city", day:5, side:"bottom", lane:0 },
+  { name:"业拉山", alt:4658, dist:109, type:"pass", day:6, side:"top", lane:1 },
+  { name:"邦达", alt:4120, dist:97, type:"city", day:6, side:"top", lane:0 },
+  { name:"八宿", alt:3280, dist:97, type:"city", day:6, side:"bottom", lane:0 },
+  { name:"然乌", alt:3960, dist:92, type:"city", day:7, side:"top", lane:1 },
+  { name:"波密", alt:2725, dist:131, type:"city", day:7, side:"bottom", lane:1 },
+  { name:"通麦", alt:2070, dist:47, type:"pass", day:8, side:"top", lane:0 },
+  { name:"鲁朗", alt:3285, dist:48, type:"city", day:8, side:"top", lane:1 },
+  { name:"林芝", alt:2930, dist:75, type:"city", day:8, side:"bottom", lane:1 },
+  { name:"工布江达", alt:3440, dist:130, type:"city", day:10, side:"bottom", lane:0 },
+  { name:"墨竹工卡", alt:3823, dist:99, type:"city", day:11, side:"top", lane:1 },
+  { name:"米拉山", alt:5013, dist:116, type:"pass", day:11, side:"top", lane:0 },
+  { name:"拉萨", alt:3650, dist:69, type:"city", day:11, side:"bottom", lane:0 },
 ];
 
 const SCHEMATIC_DISTANCE_LABEL_INDICES = new Set([1, 5, 7, 9, 14, 16, 19, 24, 26]);
-
-const SCHEMATIC_LABEL_OVERRIDES = {
-  成都: { city: { dx: 2, dy: 92 } },
-  雅安: { city: { dx: 8, dy: 90 } },
-  泸定: { city: { dx: 18, dy: 98 } },
-  康定: { city: { dx: 18, dy: 88 } },
-  新都桥: { city: { dx: 4, dy: 80 } },
-  雅江: { city: { dx: 0, dy: 100 } },
-  理塘: { city: { dx: 0, dy: 66 } },
-  巴塘: { city: { dx: 0, dy: 94 } },
-  芒康: { city: { dx: 6, dy: 70 } },
-  左贡: { city: { dx: 4, dy: 90 } },
-  邦达: { city: { dx: 0, dy: 74 } },
-  八宿: { city: { dx: 8, dy: 94 } },
-  然乌: { city: { dx: -10, dy: 84 } },
-  波密: { city: { dx: -12, dy: 96 } },
-  鲁朗: { city: { dx: 4, dy: 88 } },
-  林芝: { city: { dx: 18, dy: 92 } },
-  工布江达: { city: { dx: 8, dy: 94 } },
-  墨竹工卡: { city: { dx: 8, dy: 86 } },
-  拉萨: { city: { dx: 18, dy: 76 } },
-  二郎山: { pass: { dx: 0, dy: -72, altDy: -34 } },
-  折多山: { pass: { dx: 0, dy: -96, altDy: -54 } },
-  卡子拉山: { pass: { dx: 0, dy: -92, altDy: -50 } },
-  海子山: { pass: { dx: 0, dy: -98, altDy: -56 } },
-  拉乌山: { pass: { dx: 0, dy: -68, altDy: -32 } },
-  东达山: { pass: { dx: 0, dy: -112, altDy: -64 } },
-  业拉山: { pass: { dx: 4, dy: -82, altDy: -40 } },
-  通麦: { pass: { dx: 8, dy: -68, altDy: -36 } },
-  米拉山: { pass: { dx: 8, dy: -88, altDy: -48 } },
-};
 
 const EQUIPMENT = {
   "个人骑行装备": {
@@ -464,29 +433,6 @@ function VerticalLabel({ text, x, y, color, fontSize, gap = 22 }) {
   );
 }
 
-function clamp(value, min, max) {
-  return Math.min(max, Math.max(min, value));
-}
-
-function getCityLabelOffset(index) {
-  const pattern = [
-    { dx: 0, dy: 92 },
-    { dx: 0, dy: 76 },
-    { dx: 0, dy: 102 },
-    { dx: 0, dy: 82 },
-  ];
-  return pattern[index % pattern.length];
-}
-
-function getPassLabelOffset(index) {
-  const pattern = [
-    { dx: 0, dy: -72, altDy: -36 },
-    { dx: 0, dy: -58, altDy: -24 },
-    { dx: 0, dy: -84, altDy: -42 },
-  ];
-  return pattern[index % pattern.length];
-}
-
 function parseGpxText(text) {
   const parser = new DOMParser();
   const xml = parser.parseFromString(text, "application/xml");
@@ -603,10 +549,11 @@ function ElevationChart({ days, activeDay, onSelect }) {
 function RouteMap({ activeDay, importedTracks, onSelectDay }) {
   const width = 1280;
   const height = 620;
-  const padding = 52;
-  const cityLabelBottom = height - 118;
-  const cityLabelTop = 180;
-  const passLabelTop = 86;
+  const padding = 70;
+  const topNameYs = [118, 164];
+  const topAltGap = 28;
+  const bottomNameYs = [450, 496];
+  const bottomAltGap = 30;
   const points = getSchematicLayout(ROUTE_SCHEMATIC_NODES, width, height, padding);
   const officialPath = buildSmoothPath(points);
 
@@ -625,6 +572,8 @@ function RouteMap({ activeDay, importedTracks, onSelectDay }) {
 
       <svg viewBox={`0 0 ${width} ${height}`} style={{ width:"100%", display:"block", background:"linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015))" }}>
         <text x={padding} y="42" fill="rgba(236,243,250,0.9)" fontSize="26" fontWeight="900">《川藏南线示意图》</text>
+        <text x="220" y="72" fill="rgba(125,182,255,0.55)" fontSize="15" fontWeight="800" letterSpacing="6">四川段</text>
+        <text x="820" y="72" fill="rgba(125,182,255,0.55)" fontSize="15" fontWeight="800" letterSpacing="6">西藏段</text>
 
         <path d={officialPath} fill="none" stroke="rgba(75,177,255,0.18)" strokeWidth="16" strokeLinecap="round" strokeLinejoin="round" />
         <path d={officialPath} fill="none" stroke="#4ba7ff" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -633,29 +582,25 @@ function RouteMap({ activeDay, importedTracks, onSelectDay }) {
           if (!SCHEMATIC_DISTANCE_LABEL_INDICES.has(index + 1)) return null;
           const prev = points[index];
           const midX = (prev.x + point.x) / 2;
-          const bend = index % 2 === 0 ? 34 : 48;
-          const midY = Math.min(prev.y, point.y) - bend;
+          const midY = ((prev.y + point.y) / 2) - (index % 2 === 0 ? 8 : -8);
           return (
-            <text key={`${prev.name}-${point.name}`} x={midX} y={midY} textAnchor="middle" fill="rgba(255,240,214,0.88)" fontSize="13" fontStyle="italic">
+            <text key={`${prev.name}-${point.name}`} x={midX} y={midY} textAnchor="middle" fill="rgba(255,240,214,0.9)" fontSize="13" fontStyle="italic">
               {point.dist}km
             </text>
           );
         })}
 
-        {points.map((point, index) => {
+        {points.map((point) => {
           const isPass = point.type === "pass";
           const isActive = point.day - 1 === activeDay;
           const isCity = point.type === "city";
           const labelColor = isPass ? "#8bc9ff" : "#2e96ff";
-          const cityOffset = SCHEMATIC_LABEL_OVERRIDES[point.name]?.city || getCityLabelOffset(index);
-          const passOffset = SCHEMATIC_LABEL_OVERRIDES[point.name]?.pass || getPassLabelOffset(index);
-          const altY = isPass ? point.y + passOffset.altDy : point.y - 18;
-          const unclampedNameY = isCity ? point.y + cityOffset.dy : point.y + passOffset.dy;
-          const labelHeight = isCity ? Math.max(point.name.length - 1, 0) * 18 : 0;
-          const nameY = isCity
-            ? clamp(unclampedNameY, cityLabelTop, cityLabelBottom - labelHeight)
-            : clamp(unclampedNameY, passLabelTop, point.y - 44);
-          const rotation = isCity ? 0 : 0;
+          const lane = point.lane || 0;
+          const nameX = point.x;
+          const nameY = point.side === "top" ? topNameYs[lane] : bottomNameYs[lane];
+          const altY = point.side === "top"
+            ? nameY - topAltGap
+            : nameY + Math.max(point.name.length - 1, 0) * 18 + bottomAltGap;
 
           return (
             <g key={point.name} style={{ cursor:"pointer" }} onClick={() => onSelectDay(Math.max(0, point.day - 1))}>
@@ -663,13 +608,13 @@ function RouteMap({ activeDay, importedTracks, onSelectDay }) {
               {isPass && (
                 <path d={`M ${point.x - 18} ${point.y + 18} L ${point.x - 6} ${point.y - 6} L ${point.x + 2} ${point.y + 10} L ${point.x + 14} ${point.y - 14} L ${point.x + 26} ${point.y + 18}`} fill="none" stroke="#2a95ff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" opacity="0.9" />
               )}
-              <text x={point.x} y={isPass ? clamp(altY, 58, point.y - 18) : altY} textAnchor="middle" fill="rgba(236,243,250,0.92)" fontSize="12" fontWeight="700">
+              <text x={nameX} y={altY} textAnchor="middle" fill="rgba(236,243,250,0.92)" fontSize="12" fontWeight="700">
                 {point.alt}
               </text>
               {isCity ? (
                 <VerticalLabel
                   text={point.name}
-                  x={point.x + cityOffset.dx}
+                  x={nameX}
                   y={nameY}
                   color={labelColor}
                   fontSize={17}
@@ -677,13 +622,12 @@ function RouteMap({ activeDay, importedTracks, onSelectDay }) {
                 />
               ) : (
                 <text
-                  x={point.x + passOffset.dx}
+                  x={nameX}
                   y={nameY}
                   textAnchor="middle"
                   fill={labelColor}
                   fontSize={14}
                   fontWeight="900"
-                  transform={rotation ? `rotate(${rotation} ${point.x} ${nameY})` : undefined}
                 >
                   {point.name}
                 </text>
