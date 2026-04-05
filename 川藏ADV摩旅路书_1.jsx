@@ -44,34 +44,34 @@ const ROUTE_POINTS = [
 ];
 
 const ROUTE_SCHEMATIC_NODES = [
-  { name:"成都", alt:512, dist:0, type:"city", day:1, side:"bottom", lane:0 },
-  { name:"雅安", alt:641, dist:151, type:"city", day:1, side:"bottom", lane:1 },
-  { name:"二郎山", alt:2170, dist:88, type:"pass", day:1, side:"top", lane:1 },
-  { name:"泸定", alt:1330, dist:50, type:"city", day:1, side:"bottom", lane:0 },
-  { name:"康定", alt:2530, dist:51, type:"city", day:2, side:"top", lane:0 },
-  { name:"折多山", alt:4298, dist:72, type:"pass", day:2, side:"top", lane:1 },
-  { name:"新都桥", alt:3460, dist:83, type:"city", day:2, side:"bottom", lane:0 },
-  { name:"雅江", alt:2530, dist:132, type:"city", day:3, side:"bottom", lane:1 },
-  { name:"卡子拉山", alt:4718, dist:132, type:"pass", day:3, side:"top", lane:0 },
-  { name:"理塘", alt:4014, dist:132, type:"city", day:3, side:"bottom", lane:0 },
-  { name:"海子山", alt:4685, dist:174, type:"pass", day:4, side:"top", lane:1 },
-  { name:"巴塘", alt:2580, dist:174, type:"city", day:4, side:"bottom", lane:1 },
-  { name:"芒康", alt:3875, dist:107, type:"city", day:5, side:"top", lane:0 },
-  { name:"拉乌山", alt:4338, dist:49, type:"pass", day:5, side:"top", lane:1 },
-  { name:"东达山", alt:5008, dist:44, type:"pass", day:5, side:"top", lane:0 },
-  { name:"左贡", alt:3877, dist:114, type:"city", day:5, side:"bottom", lane:0 },
-  { name:"业拉山", alt:4658, dist:109, type:"pass", day:6, side:"top", lane:1 },
-  { name:"邦达", alt:4120, dist:97, type:"city", day:6, side:"top", lane:0 },
-  { name:"八宿", alt:3280, dist:97, type:"city", day:6, side:"bottom", lane:1 },
-  { name:"然乌", alt:3960, dist:92, type:"city", day:7, side:"bottom", lane:0 },
-  { name:"波密", alt:2725, dist:131, type:"city", day:7, side:"bottom", lane:1 },
-  { name:"通麦", alt:2070, dist:47, type:"pass", day:8, side:"bottom", lane:0 },
-  { name:"鲁朗", alt:3285, dist:48, type:"city", day:8, side:"top", lane:1 },
-  { name:"林芝", alt:2930, dist:75, type:"city", day:8, side:"bottom", lane:0 },
-  { name:"工布江达", alt:3440, dist:130, type:"city", day:10, side:"bottom", lane:1 },
-  { name:"墨竹工卡", alt:3823, dist:99, type:"city", day:11, side:"top", lane:0 },
-  { name:"米拉山", alt:5013, dist:116, type:"pass", day:11, side:"top", lane:1 },
-  { name:"拉萨", alt:3650, dist:69, type:"city", day:11, side:"bottom", lane:0 },
+  { name:"成都", alt:512, dist:0, type:"city", day:1, side:"bottom" },
+  { name:"雅安", alt:641, dist:151, type:"city", day:1, side:"bottom" },
+  { name:"二郎山", alt:2170, dist:88, type:"pass", day:1, side:"top" },
+  { name:"泸定", alt:1330, dist:50, type:"city", day:1, side:"bottom" },
+  { name:"康定", alt:2530, dist:51, type:"city", day:2, side:"top" },
+  { name:"折多山", alt:4298, dist:72, type:"pass", day:2, side:"top" },
+  { name:"新都桥", alt:3460, dist:83, type:"city", day:2, side:"bottom" },
+  { name:"雅江", alt:2530, dist:132, type:"city", day:3, side:"bottom" },
+  { name:"卡子拉山", alt:4718, dist:132, type:"pass", day:3, side:"top" },
+  { name:"理塘", alt:4014, dist:132, type:"city", day:3, side:"bottom" },
+  { name:"海子山", alt:4685, dist:174, type:"pass", day:4, side:"top" },
+  { name:"巴塘", alt:2580, dist:174, type:"city", day:4, side:"bottom" },
+  { name:"芒康", alt:3875, dist:107, type:"city", day:5, side:"top" },
+  { name:"拉乌山", alt:4338, dist:49, type:"pass", day:5, side:"bottom" },
+  { name:"东达山", alt:5008, dist:44, type:"pass", day:5, side:"top" },
+  { name:"左贡", alt:3877, dist:114, type:"city", day:5, side:"bottom" },
+  { name:"业拉山", alt:4658, dist:109, type:"pass", day:6, side:"top" },
+  { name:"邦达", alt:4120, dist:97, type:"city", day:6, side:"top" },
+  { name:"八宿", alt:3280, dist:97, type:"city", day:6, side:"bottom" },
+  { name:"然乌", alt:3960, dist:92, type:"city", day:7, side:"top" },
+  { name:"波密", alt:2725, dist:131, type:"city", day:7, side:"bottom" },
+  { name:"通麦", alt:2070, dist:47, type:"pass", day:8, side:"bottom" },
+  { name:"鲁朗", alt:3285, dist:48, type:"city", day:8, side:"top" },
+  { name:"林芝", alt:2930, dist:75, type:"city", day:8, side:"bottom" },
+  { name:"工布江达", alt:3440, dist:130, type:"city", day:10, side:"bottom" },
+  { name:"墨竹工卡", alt:3823, dist:99, type:"city", day:11, side:"top" },
+  { name:"米拉山", alt:5013, dist:116, type:"pass", day:11, side:"top" },
+  { name:"拉萨", alt:3650, dist:69, type:"city", day:11, side:"bottom" },
 ];
 
 const SCHEMATIC_DISTANCE_LABEL_INDICES = new Set([1, 5, 7, 9, 14, 16, 19, 24, 26]);
@@ -434,6 +434,10 @@ function VerticalLabel({ text, x, y, color, fontSize, gap = 22 }) {
   );
 }
 
+function labelBlockHeight(text, gap) {
+  return Math.max(0, text.length - 1) * gap;
+}
+
 function parseGpxText(text) {
   const parser = new DOMParser();
   const xml = parser.parseFromString(text, "application/xml");
@@ -551,10 +555,9 @@ function RouteMap({ activeDay, importedTracks, onSelectDay }) {
   const width = 1340;
   const height = 660;
   const padding = 70;
-  const topNameYs = [138, 176];
-  const topAltGap = 22;
-  const bottomNameYs = [486, 528];
-  const bottomAltGap = 22;
+  const guideLength = 84;
+  const labelGap = 14;
+  const labelStep = 18;
   const points = getSchematicLayout(ROUTE_SCHEMATIC_NODES, width, height, padding);
   const officialPath = buildSmoothPath(points);
 
@@ -573,8 +576,8 @@ function RouteMap({ activeDay, importedTracks, onSelectDay }) {
 
       <svg viewBox={`0 0 ${width} ${height}`} style={{ width:"100%", display:"block", background:"linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015))" }}>
         <text x={padding} y="42" fill="rgba(236,243,250,0.9)" fontSize="26" fontWeight="900">《川藏南线示意图》</text>
-        <text x="220" y="72" fill="rgba(125,182,255,0.55)" fontSize="15" fontWeight="800" letterSpacing="6">四川段</text>
-        <text x="820" y="72" fill="rgba(125,182,255,0.55)" fontSize="15" fontWeight="800" letterSpacing="6">西藏段</text>
+        <VerticalLabel text="四川段" x="220" y="68" color="rgba(125,182,255,0.55)" fontSize={14} gap={16} />
+        <VerticalLabel text="西藏段" x="820" y="68" color="rgba(125,182,255,0.55)" fontSize={14} gap={16} />
 
         <path d={officialPath} fill="none" stroke="rgba(75,177,255,0.18)" strokeWidth="16" strokeLinecap="round" strokeLinejoin="round" />
         <path d={officialPath} fill="none" stroke="#4ba7ff" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -596,15 +599,17 @@ function RouteMap({ activeDay, importedTracks, onSelectDay }) {
           const isActive = point.day - 1 === activeDay;
           const isCity = point.type === "city";
           const labelColor = isPass ? "#8bc9ff" : "#2e96ff";
-          const lane = point.lane || 0;
           const nameX = point.x;
-          const nameY = point.side === "top" ? topNameYs[lane] : bottomNameYs[lane];
+          const textHeight = labelBlockHeight(point.name, labelStep);
+          const nameY = point.side === "top"
+            ? point.y - guideLength - labelGap - textHeight
+            : point.y + guideLength + labelGap;
           const altY = point.side === "top"
-            ? nameY - topAltGap
-            : nameY + Math.max(point.name.length - 1, 0) * 18 + bottomAltGap;
+            ? nameY - labelGap
+            : nameY + textHeight + labelGap + 2;
           const guideStartY = point.side === "top"
-            ? nameY + 8
-            : nameY - 10;
+            ? point.y - guideLength
+            : point.y + guideLength;
           const guideEndY = point.side === "top"
             ? point.y - 14
             : point.y + 14;
@@ -627,27 +632,14 @@ function RouteMap({ activeDay, importedTracks, onSelectDay }) {
               <text x={nameX} y={altY} textAnchor="middle" fill="rgba(236,243,250,0.92)" fontSize="12" fontWeight="700">
                 {point.alt}
               </text>
-              {isCity ? (
-                <VerticalLabel
-                  text={point.name}
-                  x={nameX}
-                  y={nameY}
-                  color={labelColor}
-                  fontSize={17}
-                  gap={18}
-                />
-              ) : (
-                <text
-                  x={nameX}
-                  y={nameY}
-                  textAnchor="middle"
-                  fill={labelColor}
-                  fontSize={14}
-                  fontWeight="900"
-                >
-                  {point.name}
-                </text>
-              )}
+              <VerticalLabel
+                text={point.name}
+                x={nameX}
+                y={nameY}
+                color={labelColor}
+                fontSize={isCity ? 17 : 16}
+                gap={labelStep}
+              />
               {isActive && (
                 <circle cx={point.x} cy={point.y} r="14" fill="none" stroke="rgba(245,166,35,0.42)" strokeWidth="3" />
               )}
